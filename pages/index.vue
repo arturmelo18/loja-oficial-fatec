@@ -17,11 +17,24 @@
         <el-input
           v-model="state.password"
           placeholder="Digite a sua senha"
-          :type="isPasswordHidden ? 'password' : 'text'"
+          :type="!isPasswordHidden ? 'password' : 'text'"
         />
+        <el-checkbox v-model="isPasswordHidden">
+          Visualizar senha
+        </el-checkbox>
       </div>
-      <div class="mt-2 mb-2 flex justify-center">
-        <el-button>Entrar</el-button>
+      <div class="mt-2 mb-2 buttons">
+        <nuxt-link
+          class="button inline-flex items-center justify-center px-4 py-1 text-sm font-medium text-[#606266] transition-colors duration-200 bg-white border border-[#dcdfe6] rounded hover:text-[#409eff] hover:border-[#c6e2ff] hover:bg-[#ecf5ff] active:border-[#409eff] focus:outline-none"
+          to="/createUser"
+        >Criar usuário</nuxt-link>
+        <el-button
+          class="button"
+          :disabled="isLoading"
+          @click="authUser"
+        >
+          Entrar
+        </el-button>
       </div>
       <footer class="text-center pt-2 pb-2">
         LOF Todos os Direitos Reservados
@@ -37,6 +50,37 @@ const state = reactive({
 })
 
 const isPasswordHidden = ref(false)
+const isLoading = ref(false)
+
+async function authUser() {
+  isLoading.value = true
+
+  try {
+    const response = await $fetch('/api/user/getUser', {
+      method: 'POST',
+      body: {
+        email: state.email,
+        password: state.password,
+      },
+    })
+
+    if (!response.auth) {
+      ElMessage.error('Email ou senha incorretos.')
+      return
+    }
+
+    ElMessage.success('Autenticação realizada com sucesso!')
+
+    await navigateTo('/homePage')
+  }
+  catch (error: any) {
+    ElMessage.error(error.data?.statusMessage || 'Erro na autenticação')
+    console.error(error)
+  }
+  finally {
+    isLoading.value = false
+  }
+}
 </script>
 
 <style lang="css" scoped>
@@ -61,9 +105,19 @@ const isPasswordHidden = ref(false)
     display: flex;
     flex-direction: column;
     padding-left: 10px;
-    padding-right: 20px;
+    padding-right: 10px;
     width: 500px;
 }
+
+.buttons {
+  display: flex;
+  justify-content: space-around;
+}
+
+.button {
+  width: 200px;
+}
+
 footer {
     color: #B0B0B0;
     border-top: 1px solid #e7e7e7;
