@@ -1,5 +1,6 @@
 import { UserSchema } from '~/server/models/user'
 import bcrypt from 'bcrypt'
+import type { ViaCep } from '~/types/ViaCep'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -11,9 +12,9 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { name, email, password, zipcode, state, city, street, number, complement } = body
+  const { name, email, password, zipcode, state, city, neighborhood, street, number, complement } = body
 
-  if (!name || !email || !password || !zipcode || !state || !city || !street || !number) {
+  if (!name || !email || !password || !zipcode || !state || !city || !neighborhood || !street || !number) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Todos os campos obrigatórios devem ser preenchidos.',
@@ -66,6 +67,7 @@ export default defineEventHandler(async (event) => {
     zipcode,
     state,
     city,
+    neighborhood,
     street,
     number,
     complement: complement ? complement : '',
@@ -93,20 +95,3 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, statusMessage: 'Erro ao salvar usuário no banco de dados' })
   }
 })
-
-interface ViaCep {
-  cep?: string
-  logradouro?: string
-  complemento?: string
-  unidade?: string
-  bairro?: string
-  localidade?: string
-  uf?: string
-  estado?: string
-  regiao?: string
-  ibge?: string
-  gia?: string
-  ddd?: string
-  siafi?: string
-  erro?: boolean
-}
