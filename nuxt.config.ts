@@ -1,12 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: [
-    "@element-plus/nuxt",
-    "@nuxt/eslint",
-    "@nuxtjs/tailwindcss",
-    "nuxt-mongoose",
-    "@nuxt/ui",
-  ],
+  modules: ["@element-plus/nuxt", "@nuxt/eslint", "nuxt-mongoose", "@nuxt/ui"],
   css: ["~/assets/css/main.css"],
   devtools: { enabled: true },
   compatibilityDate: "2025-07-15",

@@ -13,7 +13,6 @@
     "@element-plus/nuxt": "^1.1.5",
     "@nuxt/eslint": "^1.15.2",
     "@nuxt/ui": "^4.5.0",
-    "@nuxtjs/tailwindcss": "^6.14.0",
     "bcrypt": "^6.0.0",
     "element-plus": "^2.13.3",
     "nuxt": "^4.3.1",
