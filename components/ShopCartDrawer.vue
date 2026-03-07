@@ -1,16 +1,16 @@
 <template>
-  <USlideover :dismissible="false" title="Carrinho de compras">
-    <UButton color="neutral" variant="subtle" icon="i-lucide-shopping-cart" />
+  <div class="page-container">
+    <USlideover :dismissible="false" title="Carrinho de compras">
+      <UButton color="neutral" variant="subtle" icon="i-lucide-shopping-cart" />
 
-    <template #content>
-      <div v-for="item in itens">
-        <div>
+      <template #content>
+        <div v-for="item in itens">
           <h1>{{ item.name }}</h1>
           <h2>{{ item.price }}</h2>
         </div>
-      </div>
-    </template>
-  </USlideover>
+      </template>
+    </USlideover>
+  </div>
 </template>
 
 <script>
@@ -25,3 +25,13 @@ const itens = [
   },
 ];
 </script>
+
+<style>
+.page-container {
+  background-color: #f9fafb;
+}
+.content-item {
+  color: white;
+  font-size: large;
+}
+</style>
