@@ -78,6 +78,8 @@ export default defineEventHandler(async (event) => {
       name,
       email,
       password: hashedPassword,
+      // TODO: mudar isso quando a tela de administrador for criada
+      kind: 'user',
       address,
     })
 
