@@ -1,0 +1,11 @@
+import type { Address } from './Address'
+
+export interface User {
+  name: string
+  email: string
+  password: string
+  kind: 'user' | 'admin'
+  address: Address
+  createdAt: Date
+  updatedAt: Date
+}
