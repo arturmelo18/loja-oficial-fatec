@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen w-screen flex justify-center items-center">
+  <div class="h-screen w-screen flex justify-center items-center bg-white">
     <el-card
       class="content"
       :body-style="{ padding: '0px' }"
@@ -56,7 +56,7 @@ async function authUser() {
   isLoading.value = true
 
   try {
-    const response = await $fetch('/api/user/getUser', {
+    const response = await $fetch('/api/user/authUser', {
       method: 'POST',
       body: {
         email: state.email,
