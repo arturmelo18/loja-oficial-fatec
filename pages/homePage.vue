@@ -1,11 +1,24 @@
 <template>
-  <div>
-    <!-- TODO Fazer essa página -->
-    <h1>AIIIIIII AMO O CLEVINHO DE IPHONE</h1>
+  <div class="h-screen w-screen bg-white">
+    <div class="nav-bg">
+      <nav-bar />
+    </div>
+    <div class="products">
+      <h1>Produtos</h1>
+    </div>
   </div>
-  <ShopCartDrawer />
+  <!--<ShopCartDrawer />-->
 </template>
 
-<script>
+<script setup lang="ts">
 import ShopCartDrawer from "~/components/ShopCartDrawer.vue";
 </script>
+
+<style lang="css" scoped>
+.nav-bg {
+  background-image: url('/imgs/cleversson.jpeg');
+  height: 600px;
+  background-size: cover; 
+  background-position: center; 
+}
+</style>
