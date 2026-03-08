@@ -9,22 +9,30 @@
       </div>
       <div class="inputs mt-2 mb-2">
         <span class="mb-2">Digite seu email:</span>
-        <el-input v-model="state.email" placeholder="Digite o seu email" />
+        <el-input
+          v-model="state.email"
+          placeholder="Digite o seu email"
+        />
         <span class="mt-2 mb-2">Digite sua senha:</span>
         <el-input
           v-model="state.password"
           placeholder="Digite a sua senha"
           :type="!isPasswordHidden ? 'password' : 'text'"
         />
-        <el-checkbox v-model="isPasswordHidden"> Visualizar senha </el-checkbox>
+        <el-checkbox v-model="isPasswordHidden">
+          Visualizar senha
+        </el-checkbox>
       </div>
       <div class="mt-2 mb-2 buttons">
         <nuxt-link
           class="button inline-flex items-center justify-center px-4 py-1 text-sm font-medium text-[#606266] transition-colors duration-200 bg-white border border-[#dcdfe6] rounded hover:text-[#409eff] hover:border-[#c6e2ff] hover:bg-[#ecf5ff] active:border-[#409eff] focus:outline-none"
           to="/createUser"
-          >Criar usuário</nuxt-link
+        >Criar usuário</nuxt-link>
+        <el-button
+          class="button"
+          :disabled="isLoading"
+          @click="authUser"
         >
-        <el-button class="button" :disabled="isLoading" @click="authUser">
           Entrar
         </el-button>
       </div>
@@ -36,39 +44,46 @@
 </template>
 
 <script lang="ts" setup>
-const state = reactive({
-  email: "",
-  password: "",
-});
+import type { User } from '~/types/User'
 
-const isPasswordHidden = ref(false);
-const isLoading = ref(false);
+const state = reactive({
+  email: '',
+  password: '',
+})
+
+const isPasswordHidden = ref(false)
+const isLoading = ref(false)
+const authStore = useAuthStore()
 
 async function authUser() {
-  isLoading.value = true;
+  isLoading.value = true
 
   try {
-    const response = await $fetch('/api/user/authUser', {
+    const response = await $fetch<User>('/api/user/authUser', {
       method: 'POST',
       body: {
         email: state.email,
         password: state.password,
       },
-    });
+    })
 
-    if (!response.auth) {
-      ElMessage.error("Email ou senha incorretos.");
-      return;
+    if (!response) {
+      ElMessage.error('Email ou senha incorretos.')
+      return
     }
 
-    ElMessage.success("Autenticação realizada com sucesso!");
+    authStore.setUser(response)
 
-    await navigateTo("/homePage");
-  } catch (error: any) {
-    ElMessage.error(error.data?.statusMessage || "Erro na autenticação");
-    console.error(error);
-  } finally {
-    isLoading.value = false;
+    ElMessage.success('Autenticação realizada com sucesso!')
+
+    await navigateTo('/homePage')
+  }
+  catch (error: any) {
+    ElMessage.error(error.data?.statusMessage || 'Erro na autenticação')
+    console.error(error)
+  }
+  finally {
+    isLoading.value = false
   }
 }
 </script>
