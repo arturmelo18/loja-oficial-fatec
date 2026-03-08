@@ -1,7 +1,8 @@
 import { defineMongooseModel } from '#nuxt/mongoose'
 import { AddressSchema } from './address'
+import type { User } from '../../types/User'
 
-export const UserSchema = defineMongooseModel({
+export const UserSchema = defineMongooseModel<User>({
   name: 'User',
   schema: {
     name: {
@@ -17,9 +18,17 @@ export const UserSchema = defineMongooseModel({
       type: String,
       required: true,
     },
+    kind: {
+      type: String,
+      required: true,
+      enum: ['admin', 'user'],
+    },
     address: {
       type: AddressSchema,
       required: true,
     },
+  },
+  options: {
+    timestamps: true,
   },
 })
