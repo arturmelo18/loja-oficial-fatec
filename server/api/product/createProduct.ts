@@ -1,0 +1,58 @@
+import generateCdnImage from '~/server/utils/helpers/generateCdnImage'
+
+export default defineEventHandler(async (event) => {
+  const body = await readBody(event)
+
+  if (!body) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Você deve passar todas as informações para criar um produtp',
+    })
+  }
+
+  const { name, price, quantity, description, image } = body
+
+  if (!name || !price || !quantity || !description || !image) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Todos os campos obrigatórios devem ser preenchidos.',
+    })
+  }
+
+  if (price < 0) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'O preço do produto deve ser positivo.',
+    })
+  }
+
+  if (quantity < 0) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'A quantidade do produto deve ser positiva.',
+    })
+  }
+
+  const cdnImg = await generateCdnImage(image)
+
+  try {
+    const product = ProductSchema.create({
+      name,
+      price,
+      quantity,
+      description,
+      image: cdnImg.url || '',
+    })
+
+    const result = {
+      status: 'sucesso',
+      product,
+    }
+
+    return result
+  }
+  catch (error: any) {
+    if (error.statusCode) throw error
+    throw createError({ statusCode: 500, statusMessage: 'Erro ao salvar usuário no banco de dados' })
+  }
+})
