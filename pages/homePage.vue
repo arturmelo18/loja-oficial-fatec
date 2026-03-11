@@ -1,7 +1,7 @@
 <template>
   <div class="h-screen w-screen bg-white">
     <div class="nav-bg">
-      <nav-bar />
+      <nav-bar :use-hover="true"/>
     </div>
     <div class="products">
       <h1>Produtos</h1>
@@ -22,6 +22,5 @@ definePageMeta({
   background-image: url('/imgs/cleversson.jpeg');
   height: 600px;
   background-size: cover;
-  background-position: center;
 }
 </style>

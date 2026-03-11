@@ -1,5 +1,5 @@
 <template>
-  <nav class="nav-bar flex">
+  <nav class="flex" :class="props.useHover ? 'nav-bar' : 'nav-bar-no-hover'">
     <nuxt-link
       to="/homePage"
       class="self-center text-lg min-w-100 ml-2"
@@ -17,6 +17,11 @@
 </template>
 
 <script setup lang="ts">
+
+const props = defineProps<{
+  useHover?: boolean
+}>()
+
 const cards = [
   {
     title: 'Home',
@@ -30,6 +35,14 @@ const cards = [
 </script>
 
 <style lang="css" scoped>
+.nav-bar-no-hover {
+  color: #ffffff;
+  background: #4A0F01;
+  font-weight: 500;
+  font-size: 15px;
+  height: 75px;
+}
+
 .nav-bar {
   color: #000000;
   font-weight: 500;
