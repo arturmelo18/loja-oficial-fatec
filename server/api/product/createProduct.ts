@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   if (!body) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Você deve passar todas as informações para criar um produtp',
+      statusMessage: 'Você deve passar todas as informações para criar um produto',
     })
   }
 
