@@ -1,17 +1,15 @@
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event)
+  const { _id } = getQuery(event)
 
-  if (!body) {
+  if (!_id) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Para obter um produto específico é necessário passar seu identificador.',
+      statusMessage: `${event}`,
     })
   }
-
-  const { id } = body
-
+  
   const product = await ProductSchema.findOne({
-    _id: id
+    _id: _id
   })
 
   if (!product) {

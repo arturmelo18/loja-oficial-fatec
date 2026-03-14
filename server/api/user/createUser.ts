@@ -86,7 +86,7 @@ export default defineEventHandler(async (event) => {
     return {
       status: 'sucesso',
       user: {
-        id: newUser._id,
+        _id: newUser._id,
         name: newUser.name,
         email: newUser.email,
       },
