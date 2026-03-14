@@ -46,7 +46,6 @@ export default defineEventHandler(async (event) => {
 
     const result = {
       status: 'sucesso',
-      product,
     }
 
     return result
