@@ -9,7 +9,7 @@
       <section class="products-editor">
         <header class="flex justify-between items-center">
           <h2 class="font-medium">Produtos da loja</h2>
-          <el-button class="new-product">Criar novo produto</el-button>
+          <el-button class="new-product" @click="navigateTo('/productPage')">Criar novo produto</el-button>
         </header>
         <div v-if="!isLoadingProducts" class="products mt-5">
           <admin-product v-for="product in state.products" :product="product"/>
@@ -37,12 +37,12 @@ const state = reactive({
 })
 
 const authStore = useAuthStore()
-/*
+
 //TODO: add this middleware
 definePageMeta({
   middleware: 'auth',
 })
-*/
+
 
 onMounted(() => {
   searchProducts()
