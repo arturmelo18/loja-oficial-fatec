@@ -39,9 +39,11 @@ const state = reactive({
 const authStore = useAuthStore()
 
 //TODO: add this middleware
+/*
 definePageMeta({
   middleware: 'auth',
 })
+*/
 
 
 onMounted(() => {

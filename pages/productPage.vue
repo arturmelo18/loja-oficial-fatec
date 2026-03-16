@@ -63,13 +63,14 @@ const fileToBase64 = (file: File): Promise<string> => {
   })
 }
 
+
 onMounted(async () => {
     if (!route.query._id) return
     state.isNew = false
     try {
         state.product = await $fetch<Product>('/api/product/getProduct', {
             method: 'GET',
-            params: { _id: route.query.id }
+            params: { _id: route.query._id }
         })
     } catch (error) {
         ElMessage.error('Erro ao carregar produto')

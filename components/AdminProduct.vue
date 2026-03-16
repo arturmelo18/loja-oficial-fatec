@@ -1,5 +1,5 @@
 <template>
-    <div class="content">
+    <div class="content mt-1">
         <img :src="props.product.image" />
         <div class="flex justify-between flex-1 ml-1">
           <span>{{ props.product.name }}</span>
