@@ -1,5 +1,5 @@
 <template>
-  <div class="content bg-white mb-5">
+  <div class="content bg-white mb-5" @click="goToDetailView">
     <img :src="imgSrc" class="flex-1"/>
     <div class="informations mt-2 flex items-start flex-wrap">
       <h2 class="mb-1">{{ props.product.name }}</h2>
@@ -25,6 +25,13 @@ const formattedPrice = computed(() =>
   }).format(Number(props.product.price) || 0)
 )
 
+function goToDetailView() {
+  if (!props.product._id) return
+  navigateTo({
+    path: '/productDetailView',
+    query: { _id: props.product._id },
+  })
+}
 </script>
 
 <style lang="css" scoped>
@@ -38,6 +45,7 @@ const formattedPrice = computed(() =>
   height: 300px;
   width: 180px;
   flex-wrap: wrap;
+  cursor: pointer;
 }
 
 img {

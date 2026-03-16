@@ -43,10 +43,9 @@ const route = useRoute();
 const isLoading = ref(false);
 const selectedFile = ref<File | null>(null);
 
-//TODO: add this middleware
-// definePageMeta({
-//   middleware: 'auth',
-// })
+definePageMeta({
+  middleware: 'auth',
+})
 
 const state = reactive({
   product: {
