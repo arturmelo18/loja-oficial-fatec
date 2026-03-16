@@ -6,12 +6,15 @@
     <gradient-divisor />
     <div class="products mt-5 bg-white">
       <h1>Produtos</h1>
-      <div v-if="!isLoading" class="flex mt-5" v-infinite-scroll="nextPage">
+      <div v-if="state.products.length === 0" class="flex justify-center">
+        <img src="../imgs/no_products.png" class="w-[800px] h-[400px]">
+      </div>
+      <div v-else-if="!isLoading" class="flex mt-5" v-infinite-scroll="nextPage">
           <product-view v-for="product in state.products" :product="product" class="ml-2 mr-2"/>
-        </div>
-        <div v-else>
+      </div>
+      <div v-else>
           <span>Carregando produtos...</span>
-        </div>
+      </div>
     </div>
     <lof-footer/>
   </div>
