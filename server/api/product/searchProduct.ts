@@ -19,8 +19,7 @@ export default defineEventHandler(async (event) => {
   } = body
 
   const safeLimit = Math.min(Math.max(Number(limit) || 10, 1), 100)
-  const safePage = Math.max(Number(page) || 1, 1)
-  const skip = (safePage - 1) * safeLimit
+  const skip = page > 0 ? (page - 1) * safeLimit : safeLimit
 
   const filter: any = {}
 
@@ -65,7 +64,7 @@ export default defineEventHandler(async (event) => {
       data: products,
       pagination: {
         total,
-        page: safePage,
+        page: page,
       },
     }
   }
