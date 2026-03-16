@@ -4,7 +4,7 @@
             <h1>Tela do produto</h1>
             <div>
                 <el-button @click="navigateTo('/adminPage')">Cancelar</el-button>
-                <el-button @click="handleSave" type="info">Salvar</el-button>
+                <el-button :disabled="isLoading" @click="handleSave" type="info">Salvar</el-button>
             </div>
         </header>
         <GradientDivisor />
@@ -40,7 +40,7 @@ import { ElMessage } from 'element-plus'
 import type { UploadFile } from 'element-plus'
 
 const route = useRoute()
-const loading = ref(false)
+const isLoading = ref(false)
 const selectedFile = ref<File | null>(null)
 
 const state = reactive({
@@ -83,7 +83,7 @@ const handleSave = async () => {
         return
     }
 
-    loading.value = true
+    isLoading.value = true
     try {
         if (selectedFile.value) {
             state.product.image = await fileToBase64(selectedFile.value)
@@ -109,7 +109,7 @@ const handleSave = async () => {
         console.error(e)
         ElMessage.error(e.statusMessage || 'Erro ao salvar')
     } finally {
-        loading.value = false
+        isLoading.value = false
     }
 }
 
