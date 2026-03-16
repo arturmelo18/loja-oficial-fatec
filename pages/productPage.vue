@@ -34,34 +34,39 @@
 </template>
 
 <script lang="ts" setup>
-import type { Product } from '~/types/Product'
-import { Plus } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
-import type { UploadFile } from 'element-plus'
+import type { Product } from "~/types/Product";
+import { Plus } from "@element-plus/icons-vue";
+import { ElMessage } from "element-plus";
+import type { UploadFile } from "element-plus";
 
-const route = useRoute()
-const isLoading = ref(false)
-const selectedFile = ref<File | null>(null)
+const route = useRoute();
+const loading = ref(false);
+const selectedFile = ref<File | null>(null);
+
+//TODO: add this middleware
+// definePageMeta({
+//   middleware: 'auth',
+// })
 
 const state = reactive({
-    product: {
-        name: '',
-        price: 0,
-        quantity: 0,
-        description: '',
-        image: ''
-    } as Product,
-    isNew: true
-})
+  product: {
+    name: "",
+    price: 0,
+    quantity: 0,
+    description: "",
+    image: "",
+  } as Product,
+  isNew: true,
+});
 
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = () => resolve(reader.result as string)
-    reader.onerror = error => reject(error)
-  })
-}
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+  });
+};
 
 
 onMounted(async () => {
@@ -78,9 +83,15 @@ onMounted(async () => {
 })
 
 const handleSave = async () => {
-    if (!state.product.name || !state.product.price) {
-        ElMessage.warning('Preencha os campos obrigatórios')
-        return
+  if (!state.product.name || !state.product.price) {
+    ElMessage.warning("Preencha os campos obrigatórios");
+    return;
+  }
+
+  loading.value = true;
+  try {
+    if (selectedFile.value) {
+      state.product.image = await fileToBase64(selectedFile.value);
     }
 
     isLoading.value = true
@@ -111,31 +122,39 @@ const handleSave = async () => {
     } finally {
         isLoading.value = false
     }
-}
+
+    navigateTo("/adminPage");
+  } catch (e: any) {
+    console.error(e);
+    ElMessage.error(e.statusMessage || "Erro ao salvar");
+  } finally {
+    loading.value = false;
+  }
+};
 
 const handleImageChange = (uploadFile: UploadFile) => {
-  if (!uploadFile.raw) return
+  if (!uploadFile.raw) return;
 
   if (uploadFile.raw.size / 1024 / 1024 > 2) {
-    ElMessage.error('A foto não pode passar de 2MB')
-    return
+    ElMessage.error("A foto não pode passar de 2MB");
+    return;
   }
 
-  selectedFile.value = uploadFile.raw
-  
-  state.product.image = URL.createObjectURL(uploadFile.raw)
-}
+  selectedFile.value = uploadFile.raw;
+
+  state.product.image = URL.createObjectURL(uploadFile.raw);
+};
 </script>
 
 <style lang="css" scoped>
-header { 
-    background: #4a0f01;
-    color: #ffffff;
+header {
+  background: #4a0f01;
+  color: #ffffff;
 }
 
 header h1 {
-    font-size: 30px;
-    font-weight: 600;
+  font-size: 30px;
+  font-weight: 600;
 }
 
 .avatar-uploader :deep(.el-upload) {
@@ -162,6 +181,6 @@ header h1 {
 }
 
 .description p {
-    color: #3f3f3f;
+  color: #3f3f3f;
 }
 </style>
