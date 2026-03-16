@@ -13,8 +13,8 @@
             >Criar novo produto</el-button
           >
         </header>
-        <div v-if="!isLoadingProducts" class="products mt-5">
-          <admin-product v-for="product in state.products" :product="product" />
+        <div v-if="!isLoadingProducts" class="products mt-5" v-infinite-scroll="nextPage">
+          <admin-product v-for="product in state.products" :product="product"/>
         </div>
         <div v-else>
           <span>Carregando produtos...</span>
