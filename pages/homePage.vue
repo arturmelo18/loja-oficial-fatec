@@ -6,7 +6,7 @@
     <gradient-divisor />
     <div class="products mt-5 bg-white">
       <h1>Produtos</h1>
-      <div v-if="state.products.length === 0" class="flex justify-center">
+      <div v-if="state.products.length === 0 && !isLoading" class="flex justify-center">
         <img src="../imgs/no_products.png" class="w-[800px] h-[400px]">
       </div>
       <div v-else-if="!isLoading" class="flex mt-5" v-infinite-scroll="nextPage">

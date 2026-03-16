@@ -40,7 +40,7 @@ import { ElMessage } from "element-plus";
 import type { UploadFile } from "element-plus";
 
 const route = useRoute();
-const loading = ref(false);
+const isLoading = ref(false);
 const selectedFile = ref<File | null>(null);
 
 //TODO: add this middleware
@@ -88,7 +88,7 @@ const handleSave = async () => {
     return;
   }
 
-  loading.value = true;
+  isLoading.value = true;
   try {
     if (selectedFile.value) {
       state.product.image = await fileToBase64(selectedFile.value);
@@ -128,7 +128,7 @@ const handleSave = async () => {
     console.error(e);
     ElMessage.error(e.statusMessage || "Erro ao salvar");
   } finally {
-    loading.value = false;
+    isLoading.value = false;
   }
 };
 
