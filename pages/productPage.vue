@@ -21,15 +21,25 @@
             </el-upload>
             <div class="ml-4 description flex-1">
                 <p>Nome do produto:</p>
-                <el-input placeholder="Digite o nome do produto" v-model="state.product.name"/>
+                <el-input class="mb-2" placeholder="Digite o nome do produto" v-model="state.product.name"/>
                 <p>Quantidade do produto</p>
-                <el-input :min="1" :max="1000000" type="number" placeholder="Digite a quantidade do produto" v-model="state.product.quantity"/>
+                <el-input class="mb-2" :min="1" :max="1000000" type="number" placeholder="Digite a quantidade do produto" v-model="state.product.quantity"/>
                 <p>Preço do produto:</p>
-                <el-input :min="1" :max="1000000" type="number" placeholder="Digite o preço do produto" v-model="state.product.price"/>
+                <el-input class="mb-2" :min="1" :max="1000000" type="number" placeholder="Digite o preço do produto" v-model="state.product.price"/>
                 <p>Descrição do produto</p> 
-                <el-input class="h-18" placeholder="Digite a descrição do produto" v-model="state.product.description"/>
+                <el-input class="mb-2" :rows="4" type="textarea" placeholder="Digite a descrição do produto" v-model="state.product.description"/>
+                <div class="flex flex-wrap items-center">
+                  <p class="mr-2" >Habilitar produto</p>
+                  <el-tooltip content="Habilita ou desabilita seu produto na loja" placement="top">
+                    <span class="bg-gray-200 hover:bg-gray-300 text-gray-600 w-5 h-5 flex items-center justify-center rounded-full cursor-help text-xs transition-colors">
+                      ?
+                    </span>
+                  </el-tooltip>
+                  <el-switch class="w-full" v-model="state.product.active"  style="--el-switch-on-color: #4a0f01;"/>
+                </div>
             </div>
         </section>
+        <LofFooter />
     </div>
 </template>
 
@@ -54,6 +64,7 @@ const state = reactive({
     quantity: 0,
     description: "",
     image: "",
+    active: false,
   } as Product,
   isNew: true,
 });
@@ -161,7 +172,7 @@ header h1 {
   border-radius: 10px;
   cursor: pointer;
   width: 260px;
-  height: 262px;
+  height: 488px;
   display: flex;
   align-items: center;
   justify-content: center;
