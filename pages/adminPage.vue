@@ -14,7 +14,7 @@
           >
         </header>
         <div v-if="!isLoadingProducts" class="products mt-5" v-infinite-scroll="nextPage">
-          <admin-product v-for="product in state.products" :product="product"/>
+          <admin-product @update-page="searchProducts(true)" v-for="product in state.products" :product="product"/>
         </div>
         <div v-else>
           <span>Carregando produtos...</span>
@@ -49,7 +49,7 @@ onMounted(() => {
   searchProducts();
 });
 
-async function searchProducts() {
+async function searchProducts(reset = false) {
   try {
     isLoadingProducts.value = true;
     const result = await $fetch("/api/product/searchProduct", {
@@ -62,7 +62,11 @@ async function searchProducts() {
 
     state.page = result.pagination.page;
     state.total = result.pagination.total;
-    state.products = [...state.products, ...(result.data as Product[])];
+    if (reset) {
+      state.products = result.data as Product[]
+    } else {
+      state.products = [...state.products, ...(result.data as Product[])];
+    }
   } catch (error: any) {
     ElMessage.error(error.message || "Erro inesperado");
   } finally {

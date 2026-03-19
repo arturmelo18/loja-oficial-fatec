@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
 
   const { name, price, quantity, description, active, image } = body
 
-  if (!name || !price || !quantity || !description || !active || !image) {
+  if (!name || !price || !quantity || !description || !image) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Todos os campos obrigatórios devem ser preenchidos.',

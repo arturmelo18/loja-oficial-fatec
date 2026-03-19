@@ -60,8 +60,8 @@ definePageMeta({
 const state = reactive({
   product: {
     name: "",
-    price: 0,
-    quantity: 0,
+    price: 1,
+    quantity: 1,
     description: "",
     image: "",
     active: false,
@@ -171,7 +171,7 @@ header h1 {
   border: 1px solid #a8a8a8;
   border-radius: 10px;
   cursor: pointer;
-  width: 260px;
+  width: 460px;
   height: 488px;
   display: flex;
   align-items: center;
