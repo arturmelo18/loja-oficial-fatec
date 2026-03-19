@@ -19,6 +19,11 @@ export const ProductSchema = defineMongooseModel<Product>({
       required: true,
       min: 0,
     },
+    active: {
+      type: Boolean,
+      required: true,
+      default: false
+    },
     description: {
       type: String,
     },
