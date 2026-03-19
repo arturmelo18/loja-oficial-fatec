@@ -23,9 +23,9 @@
                 <p>Nome do produto:</p>
                 <el-input placeholder="Digite o nome do produto" v-model="state.product.name"/>
                 <p>Quantidade do produto</p>
-                <el-input type="number" placeholder="Digite a quantidade do produto" v-model="state.product.quantity"/>
+                <el-input :min="1" :max="1000000" type="number" placeholder="Digite a quantidade do produto" v-model="state.product.quantity"/>
                 <p>Preço do produto:</p>
-                <el-input type="number" placeholder="Digite o preço do produto" v-model="state.product.price"/>
+                <el-input :min="1" :max="1000000" type="number" placeholder="Digite o preço do produto" v-model="state.product.price"/>
                 <p>Descrição do produto</p> 
                 <el-input class="h-18" placeholder="Digite a descrição do produto" v-model="state.product.description"/>
             </div>

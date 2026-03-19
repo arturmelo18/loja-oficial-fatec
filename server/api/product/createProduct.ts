@@ -10,9 +10,9 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { name, price, quantity, description, image } = body
+  const { name, price, quantity, description, active, image } = body
 
-  if (!name || !price || !quantity || !description || !image) {
+  if (!name || !price || !quantity || !description || !active || !image) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Todos os campos obrigatórios devem ser preenchidos.',
@@ -26,10 +26,24 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  if (price > 1000000) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'O preço do produto deve ser menor que 1000000.',
+    })
+  }
+
   if (quantity < 0) {
     throw createError({
       statusCode: 400,
       statusMessage: 'A quantidade do produto deve ser positiva.',
+    })
+  }
+
+  if (quantity > 1000000) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'A quantidade do produto deve ser menor que 1000000',
     })
   }
 
@@ -41,6 +55,7 @@ export default defineEventHandler(async (event) => {
       price,
       quantity,
       description,
+      active,
       image: cdnImg.url || '',
     })
 

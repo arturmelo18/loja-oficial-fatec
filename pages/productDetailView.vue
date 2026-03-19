@@ -6,10 +6,11 @@
       <div class="product-information ml-4">
         <h1 class="mb-4 font-semibold text-5xl">{{ state.product.name }}</h1>
         <p>{{ state.product.description }}</p>
-        <h2 class="mt-2">R$ {{ formattedPrice }}</h2>
+        <h2 class="mt-2 mb-2">Preço: R$ {{ state.product.price }}</h2>
+        <h2 class="mt-2">Preço total: R$ {{ formattedPrice }}</h2>
         <p class="mt-2">Quantidade em estoque: {{ state.product.quantity }}</p>
 
-        <el-input-number v-model="state.saleQtd" :min="1" class="mt-2" />
+        <el-input-number v-model="state.saleQtd" :min="1" :max="state.product.quantity" class="mt-2" />
 
         <el-button type="info" class="mt-5">
           Comprar
