@@ -6,13 +6,17 @@ export default defineNuxtConfig({
         { 
           rel: 'stylesheet', 
           href: 'https://unicons.iconscout.com/release/v4.0.8/css/line.css' 
+        },
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap'
         }
       ]
     }
   },
   modules: ['@element-plus/nuxt', '@nuxt/eslint', 'nuxt-mongoose', '@nuxt/ui', '@pinia/nuxt', '@pinia-plugin-persistedstate/nuxt',],
   devtools: { enabled: true },
-  css: ['~/assets/css/main.css'],
+  css: ['~/assets/css/main.css', '~/assets/css/fatecano.css'],
   compatibilityDate: '2025-07-15',
   eslint: {
     config: {

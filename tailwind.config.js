@@ -12,11 +12,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        'fatec-red': '#4A0F01',
+        'burgundy': '#7A1F2E',
+        'cream': '#F2EDE6',
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        title: ['Montserrat', 'sans-serif'],
+        sans: ['DM Sans', 'sans-serif'],
+        display: ['Cormorant Garamond', 'serif'],
       },
     },
   },
