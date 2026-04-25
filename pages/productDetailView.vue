@@ -1,22 +1,54 @@
 <template>
-  <div class="h-screen w-screen bg-white">
+  <div class="h-screen w-screen bg-cream">
     <NavBar />
-    <div class="flex mx-5 my-5 justify-center">
-      <img :src="imgSrc" class="w-[400px] h-[500px]" />
-      <div class="product-information ml-4">
-        <h1 class="mb-4 font-semibold text-5xl">{{ state.product.name }}</h1>
-        <p>{{ state.product.description }}</p>
-        <h2 class="mt-2 mb-2">Preço: R$ {{ state.product.price }}</h2>
-        <h2 class="mt-2">Preço total: R$ {{ formattedPrice }}</h2>
-        <p class="mt-2">Quantidade em estoque: {{ state.product.quantity }}</p>
-
-        <el-input-number v-model="state.saleQtd" :min="1" :max="state.product.quantity" class="mt-2" />
-
-        <el-button type="info" class="mt-5">
-          Comprar
-        </el-button>
+    
+    <div class="modal-overlay open">
+      <div class="modal-box">
+        <button class="modal-close-btn" @click="navigateTo('/homePage')">×</button>
+        
+        <div class="modal-img-side">
+          <img 
+            v-if="imgSrc && !imgSrc.includes('shopping_bag')"
+            :src="imgSrc" 
+            :alt="state.product.name"
+          />
+          <span v-else class="emoji">👕</span>
+        </div>
+        
+        <div class="modal-body-side">
+          <div class="m-cat">{{ state.product.category || 'Produto' }}</div>
+          
+          <div class="m-name-row">
+            <div class="m-name">{{ state.product.name }}</div>
+          </div>
+          
+          <div class="m-price-row">
+            <span class="m-price">R$ {{ formattedPrice }}</span>
+          </div>
+          
+          <div class="m-desc">{{ state.product.description }}</div>
+          
+          <div style="margin-bottom: 20px; margin-top: 16px; font-size: 13px; color: #6B6B6B;">
+            <div>Quantidade em estoque: {{ state.product.quantity }}</div>
+          </div>
+          
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px;">
+            <el-input-number 
+              v-model="state.saleQtd" 
+              :min="1" 
+              :max="state.product.quantity"
+              size="large"
+            />
+            <span style="font-size: 13px; color: #6B6B6B;">Quantidade</span>
+          </div>
+          
+          <button class="btn btn-dark" style="width: 100%;">
+            Comprar
+          </button>
+        </div>
       </div>
     </div>
+    
     <LofFooter />
   </div>
 </template>
@@ -64,15 +96,13 @@ definePageMeta({
 })
 </script>
 
-<style lang="css" scoped>
-.product-information {
-  display: flex;
-  flex-direction: column;
-  color: #000000;
+<style scoped>
+.bg-cream {
+  background: #F2EDE6;
 }
 
-img {
-  border-radius: 9px;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+.emoji {
+  font-size: 80px;
+  opacity: 0.2;
 }
 </style>
