@@ -1,58 +1,54 @@
 <template>
-  <nav class="flex" :class="props.useHover ? 'nav-bar' : 'nav-bar-no-hover'">
-    <nuxt-link
-      to="/homePage"
-      class="self-center text-lg min-w-100 ml-2"
-    >Loja oficial da Fatec</nuxt-link>
-    <ul class="flex justify-end items-center w-full">
-      <li
-        v-for="card in cards"
-        :key="card.title"
-        class="mr-2 ml-2"
-      >
-        <nuxt-link :to="card.to">{{ card.title }}</nuxt-link>
-      </li>
+  <nav class="flex space-between">
+    <div class="nav-logo">
+      <nuxt-link to="/homePage">Fatecano</nuxt-link>
+    </div>
+    <ul class="nav-links" id="nav-links-desktop">
+      <li><nuxt-link to="/homePage">Todos os produtos</nuxt-link></li>
     </ul>
+    <el-dropdown>
+      <el-button text type="info">
+        <i class="uil uil-bars"></i>
+      </el-button>
+      <template #dropdown> 
+        <div class="flex flex-col items-start">
+          <el-dropdown-item class="w-full" @click="navigateTo('/')" v-if="authStore.getUser">
+            Minha Conta
+          </el-dropdown-item>
+          <el-dropdown-item class="w-full" @click="logout" v-if="authStore.getUser">
+            <span>Sair</span>
+          </el-dropdown-item>
+          <el-dropdown-item class="w-full" @click="navigateTo('/adminPage')" v-if="authStore.getUser?.kind == 'admin'">
+            <span>Área do administrador</span>
+          </el-dropdown-item>
+        </div>
+      </template>
+    </el-dropdown>
   </nav>
 </template>
 
 <script setup lang="ts">
+const authStore = useAuthStore()
 
-const props = defineProps<{
-  useHover?: boolean
-}>()
-
-const cards = [
-  {
-    title: 'Home',
-    to: '/homePage',
-  },
-  {
-    title: 'Área do administrador',
-    to: '/adminPage',
-  },
-]
+const logout = () => {
+  authStore.clearUser()
+  navigateTo('/')
+}
 </script>
 
-<style lang="css" scoped>
-.nav-bar-no-hover {
-  color: #ffffff;
-  background: #4A0F01;
-  font-weight: 500;
-  font-size: 15px;
-  height: 75px;
+<style scoped>
+nav a {
+  text-decoration: none;
+  color: inherit;
 }
 
-.nav-bar {
-  color: #000000;
-  font-weight: 500;
-  font-size: 15px;
-  height: 75px;
-  transition: all 0.3s ease;
+.nav-logo a {
+  text-decoration: none;
+  color: inherit;
 }
 
-.nav-bar:hover {
-  background: #4A0F01;
-  color: #ffffff;
+:deep(.el-dropdown-menu__item:hover) {
+  background-color: transparent;
+  color: var(--burgundy);
 }
 </style>
