@@ -1,5 +1,5 @@
 import { defineMongooseModel } from '#nuxt/mongoose'
-import type { Product } from '../../types/Product'
+import { Product } from '~/types/Product'
 
 export const ProductSchema = defineMongooseModel<Product>({
   name: 'Product',
