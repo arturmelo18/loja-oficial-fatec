@@ -1,45 +1,48 @@
 <template>
-  <div class="h-screen w-screen flex justify-center items-center bg-white">
-    <el-card
-      class="content"
-      :body-style="{ padding: '0px' }"
-    >
-      <div class="title">
-        <h1>Login</h1>
+  <div class="h-screen w-screen flex justify-center items-center bg-cream">
+    <div class="modal-box auth-modal-box">
+      <div class="auth-body">
+        <div class="auth-title">Bem-vindo</div>
+        <div class="auth-sub">Entre na sua conta</div>
+        
+        <div class="form-grp">
+          <label>E-mail</label>
+          <el-input 
+            v-model="state.email"
+            type="email"
+            placeholder="seu@email.com"
+          />
+        </div>
+        
+        <div>
+          <label>Senha</label>
+          <el-input 
+            v-model="state.password"
+            :type="!isPasswordHidden ? 'password' : 'text'"
+            placeholder="••••••••"
+          />
+        </div>
+        
+        <div class="flex items-center gap-2 mb-4">
+          <label for="show-pass" class="text-sm text-gray-600">Visualizar senha</label>
+          <el-checkbox
+            id="show-pass"
+            v-model="isPasswordHidden"
+            type="checkbox"
+            class="w-4 h-4"
+          />
+        </div>
+
+        <button class="btn btn-dark w-full mb-4 enter-button" :disabled="isLoading" @click="authUser">
+          {{ isLoading ? 'Entrando...' : 'Entrar' }}
+        </button>
+        
+        <div class="text-center">
+          <span class="text-sm text-gray-600">Não tem conta? </span>
+          <nuxt-link to="/createUser" class="text-burgundy font-semibold">Criar agora</nuxt-link>
+        </div>
       </div>
-      <div class="inputs mt-2 mb-2">
-        <span class="mb-2">Digite seu email:</span>
-        <el-input
-          v-model="state.email"
-          placeholder="Digite o seu email"
-        />
-        <span class="mt-2 mb-2">Digite sua senha:</span>
-        <el-input
-          v-model="state.password"
-          placeholder="Digite a sua senha"
-          :type="!isPasswordHidden ? 'password' : 'text'"
-        />
-        <el-checkbox v-model="isPasswordHidden">
-          Visualizar senha
-        </el-checkbox>
-      </div>
-      <div class="mt-2 mb-2 buttons">
-        <nuxt-link
-          class="button inline-flex items-center justify-center px-4 py-1 text-sm font-medium text-[#606266] transition-colors duration-200 bg-white border border-[#dcdfe6] rounded hover:text-[#409eff] hover:border-[#c6e2ff] hover:bg-[#ecf5ff] active:border-[#409eff] focus:outline-none"
-          to="/createUser"
-        >Criar usuário</nuxt-link>
-        <el-button
-          class="button"
-          :disabled="isLoading"
-          @click="authUser"
-        >
-          Entrar
-        </el-button>
-      </div>
-      <footer class="text-center pt-2 pb-2">
-        LOF Todos os Direitos Reservados
-      </footer>
-    </el-card>
+    </div>
   </div>
 </template>
 
@@ -56,6 +59,11 @@ const isLoading = ref(false)
 const authStore = useAuthStore()
 
 async function authUser() {
+  if (!state.email || !state.password) {
+    ElMessage.error('Preencha todos os campos')
+    return
+  }
+
   isLoading.value = true
 
   try {
@@ -73,9 +81,8 @@ async function authUser() {
     }
 
     authStore.setUser(response)
-
     ElMessage.success('Autenticação realizada com sucesso!')
-
+    
     await navigateTo('/homePage')
   }
   catch (error: any) {
@@ -88,51 +95,23 @@ async function authUser() {
 }
 </script>
 
-<style lang="css" scoped>
-.page-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  width: 100vw;
-  background-color: #f9fafb;
-}
-.content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
+<style scoped>
+.bg-cream {
+  background: #F2EDE6;
 }
 
-.title {
-  display: flex;
-  align-items: center;
-  background: #4a0f01;
-  color: #ffffff;
-  height: 50px;
-  font-size: 20px;
-  padding-left: 10px;
+el-input {
+  width: 100%;
 }
 
-.inputs {
-  display: flex;
-  flex-direction: column;
-  padding-left: 10px;
-  padding-right: 10px;
-  width: 500px;
+a {
+  text-decoration: none;
 }
 
-.buttons {
-  display: flex;
-  justify-content: space-around;
+a:hover {
+  text-decoration: underline;
 }
-
-.button {
-  width: 200px;
-}
-
-footer {
-  color: #b0b0b0;
-  border-top: 1px solid #e7e7e7;
+.enter-button {
+  margin-top: 10px;
 }
 </style>
