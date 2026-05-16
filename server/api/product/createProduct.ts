@@ -1,3 +1,4 @@
+import { AbacatePayConnector } from '~/server/connectors/AbacatePay/connector'
 import generateCdnImage from '~/server/utils/helpers/generateCdnImage'
 
 export default defineEventHandler(async (event) => {
@@ -50,13 +51,22 @@ export default defineEventHandler(async (event) => {
   const cdnImg = await generateCdnImage(image)
 
   try {
-    const product = ProductSchema.create({
+    const product = await ProductSchema.create({
       name,
       price,
       quantity,
       description,
       active,
       image: cdnImg.url || '',
+    })
+
+    const abacateProduct = await AbacatePayConnector.post('/products/create', {
+      externalId: product._id,
+      name: product.name,
+      price: product.price,
+      currency: 'BRL',
+      description: product.description,
+      imageUrl: product.image,
     })
 
     const result = {
@@ -67,6 +77,6 @@ export default defineEventHandler(async (event) => {
   }
   catch (error: any) {
     if (error.statusCode) throw error
-    throw createError({ statusCode: 500, statusMessage: 'Erro ao salvar usuário no banco de dados' })
+    throw createError({ statusCode: 500, statusMessage: 'Erro ao salvar produto no banco de dados' })
   }
 })

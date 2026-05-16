@@ -121,17 +121,25 @@ const handleSave = async () => {
     }
 
     if (state.isNew) {
+      try {
         await $fetch('/api/product/createProduct', {
           method: 'POST',
           body: state.product
         })
         ElMessage.success('Produto criado com sucesso!')
+      } catch (e: any) {
+        ElMessage.error('Erro ao criar produto')
+      }
     } else {
-        await $fetch('/api/product/updateProduct', {
-          method: 'PUT',
-          body: state.product
-        })
-        ElMessage.success('Produto atualizado com sucesso!')
+        try {
+          await $fetch('/api/product/updateProduct', {
+            method: 'PUT',
+            body: state.product
+          })
+          ElMessage.success('Produto atualizado com sucesso!')
+        } catch (e: any) {
+          ElMessage.error('Erro ao atualizar produto')
+        }
     }
     
     navigateTo('/adminPage')

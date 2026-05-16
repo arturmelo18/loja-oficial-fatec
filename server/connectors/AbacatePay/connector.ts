@@ -1,16 +1,25 @@
 export class AbacatePayConnector {
 
-    private static readonly abacatePayApiKey = process.env.ABACATEPAY_API_KEY
-    private static readonly baseUrl = 'https://api.abacatepay.com/v2'
+    private static getApiKey(): string {
+        const key = process.env.ABACATEPAY_API_KEY
+        if (!key) {
+            console.warn("Aviso: ABACATEPAY_API_KEY não está definida no ambiente.")
+        }
+        return key || ''
+    }
+
+    private static getBaseUrl(): string {
+        return 'https://api.abacatepay.com/v2'
+    }
 
     static async get(url: string, params: any): Promise<any> {
         try {
-            const response = await $fetch(`${AbacatePayConnector.baseUrl}${url}`, {
+            const response = await $fetch(`${AbacatePayConnector.getBaseUrl()}${url}`, {
                 method: 'GET',
                 query: params, 
                 headers: {
-                    Authorization: `Bearer ${AbacatePayConnector.abacatePayApiKey}`,
-                    'Accept': 'application/json'
+                    'Authorization': `Bearer ${AbacatePayConnector.getApiKey()}`,
+                    'Content-Type': 'application/json'
                 }
             })
             
@@ -23,12 +32,12 @@ export class AbacatePayConnector {
 
     static async post(url: string, params: any): Promise<any> {
         try {
-            const response = await $fetch(`${AbacatePayConnector.baseUrl}${url}`, {
+            const response = await $fetch(`${AbacatePayConnector.getBaseUrl()}${url}`, {
                 method: 'POST',
                 body: params,
                 headers: {
-                    Authorization: `Bearer ${AbacatePayConnector.abacatePayApiKey}`,
-                    'Accept': 'application/json'
+                    'Authorization': `Bearer ${AbacatePayConnector.getApiKey()}`,
+                    'Content-Type': 'application/json'
                 }
             })
             
@@ -41,12 +50,12 @@ export class AbacatePayConnector {
 
     static async put(url: string, params: any): Promise<any> {
         try {
-            const response = await $fetch(`${AbacatePayConnector.baseUrl}${url}`, {
+            const response = await $fetch(`${AbacatePayConnector.getBaseUrl()}${url}`, {
                 method: 'PUT',
                 body: params,
                 headers: {
-                    Authorization: `Bearer ${AbacatePayConnector.abacatePayApiKey}`,
-                    'Accept': 'application/json'
+                    'Authorization': `Bearer ${AbacatePayConnector.getApiKey()}`,
+                    'Content-Type': 'application/json'
                 }
             })
             
@@ -59,12 +68,12 @@ export class AbacatePayConnector {
 
     static async delete(url: string, params: any): Promise<any> {
         try {
-            const response = await $fetch(`${AbacatePayConnector.baseUrl}${url}`, {
+            const response = await $fetch(`${AbacatePayConnector.getBaseUrl()}${url}`, {
                 method: 'DELETE',
                 query: params, 
                 headers: {
-                    Authorization: `Bearer ${AbacatePayConnector.abacatePayApiKey}`,
-                    'Accept': 'application/json'
+                    'Authorization': `Bearer ${AbacatePayConnector.getApiKey()}`,
+                    'Content-Type': 'application/json'
                 }
             })
             
