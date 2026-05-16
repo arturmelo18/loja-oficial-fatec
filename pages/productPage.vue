@@ -128,7 +128,7 @@ const handleSave = async () => {
         ElMessage.success('Produto criado com sucesso!')
     } else {
         await $fetch('/api/product/updateProduct', {
-          method: 'POST',
+          method: 'PUT',
           body: state.product
         })
         ElMessage.success('Produto atualizado com sucesso!')

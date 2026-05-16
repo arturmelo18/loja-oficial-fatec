@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { _id, name, price, quantity, description, image } = body
+  const { _id, name, price, quantity, description, image, active } = body
 
   if (price !== undefined && price < 0) {
     throw createError({ statusCode: 400, statusMessage: 'Preço deve ser positivo.' })
@@ -41,6 +41,7 @@ export default defineEventHandler(async (event) => {
         quantity: quantity ?? existingProduct.quantity,
         description: description || existingProduct.description,
         image: finalImageUrl,
+        active: active ?? existingProduct.active,
       },
       { new: true }
     )
