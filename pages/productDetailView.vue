@@ -105,4 +105,25 @@ definePageMeta({
   font-size: 80px;
   opacity: 0.2;
 }
+
+.modal-img-side {
+  width: 100%;
+  height: 600px; /* ou a altura que desejar */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cream-dark);
+}
+
+.modal-img-side img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.modal-img-side .emoji {
+  font-size: 80px;
+  opacity: 0.2;
+}
 </style>
