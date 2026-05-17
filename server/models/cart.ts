@@ -27,6 +27,8 @@ export const CartSchema = defineMongooseModel<Cart>({
     user: {
       type: UserSchema,
       required: true,
+      unique: true,
+      index: true,
     },
     items: {
       type: [CartItemSchema],
