@@ -1,13 +1,13 @@
 import { defineMongooseModel } from '#nuxt/mongoose'
+import { Schema } from 'mongoose'
 import { Cart, CartItem } from '~/types/Cart'
-import { UserSchema } from './user'
-import { ProductSchema } from './product'
 
 export const CartItemSchema = defineMongooseModel<CartItem>({
   name: 'CartItem',
   schema: {
     product: {
-      type: ProductSchema,
+      type: Schema.Types.ObjectId,
+      ref: 'Product',
       required: true,
     },
     quantity: {
@@ -25,15 +25,18 @@ export const CartSchema = defineMongooseModel<Cart>({
   name: 'Cart',
   schema: {
     user: {
-      type: UserSchema,
+      type: Schema.Types.ObjectId,
+      ref: 'User',
       required: true,
       unique: true,
       index: true,
     },
-    items: {
-      type: [CartItemSchema],
-      default: [],
-    },
+    items: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'CartItem',
+      },
+    ],
   },
   options: {
     timestamps: true,
