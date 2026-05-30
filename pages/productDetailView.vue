@@ -4,7 +4,7 @@
     
     <div class="modal-overlay open">
       <div class="modal-box">
-        <button class="modal-close-btn" @click="navigateTo('/homePage')">×</button>
+        <button class="modal-close-btn" @click="navigateTo('/')"></button>
         
         <div class="modal-img-side">
           <img 
