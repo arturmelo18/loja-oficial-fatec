@@ -16,7 +16,7 @@
         </el-button>
         <template #dropdown> 
             <div class="flex flex-col items-start" v-if="authStore.getUser">
-              <el-dropdown-item class="w-full" @click="navigateTo('/')">
+              <el-dropdown-item class="w-full" @click="navigateTo('/userPage')">
                 <i class=" uil uil-user"/>
                 <span>Minha Conta</span>
               </el-dropdown-item>
