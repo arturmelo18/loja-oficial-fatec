@@ -1,117 +1,137 @@
 <template>
-  <div class="h-screen w-screen flex justify-center items-center bg-cream">
-    <div class="modal-box auth-modal-box">
-      <div class="auth-body">
-        <div class="auth-title">Bem-vindo</div>
-        <div class="auth-sub">Entre na sua conta</div>
-        
-        <div class="form-grp">
-          <label>E-mail</label>
-          <el-input 
-            v-model="state.email"
-            type="email"
-            placeholder="seu@email.com"
-          />
-        </div>
-        
-        <div>
-          <label>Senha</label>
-          <el-input 
-            v-model="state.password"
-            :type="!isPasswordHidden ? 'password' : 'text'"
-            placeholder="••••••••"
-          />
-        </div>
-        
-        <div class="flex items-center gap-2 mb-4">
-          <label for="show-pass" class="text-sm text-gray-600">Visualizar senha</label>
-          <el-checkbox
-            id="show-pass"
-            v-model="isPasswordHidden"
-            type="checkbox"
-            class="w-4 h-4"
-          />
-        </div>
-
-        <button class="btn btn-dark w-full mb-4 enter-button" :disabled="isLoading" @click="authUser">
-          {{ isLoading ? 'Entrando...' : 'Entrar' }}
-        </button>
-        
-        <div class="text-center">
-          <span class="text-sm text-gray-600">Não tem conta? </span>
-          <nuxt-link to="/createUser" class="text-burgundy font-semibold">Criar agora</nuxt-link>
+  <div class="h-screen w-screen bg-cream">
+    <nav-bar/>
+    
+    <div class="hero" v-if="slides.length > 0">
+      <div class="carousel" id="carousel">
+        <div 
+          v-for="(slide, index) in slides" 
+          :key="index"
+          :class="['carousel-slide', { active: currentSlide === index }]"
+        >
+          <div class="slide-bg" :style="{ backgroundImage: `url(${slide.image})` }"></div>
+          <div class="slide-overlay"></div>
+          <div class="slide-content">
+            <h1>{{ slide.title }}</h1>
+            <p>{{ slide.description }}</p>
+          </div>
         </div>
       </div>
+      
+      <button class="carousel-btn prev" @click="prevSlide">‹</button>
+      <button class="carousel-btn next" @click="nextSlide">›</button>
+      
+      <div class="carousel-dots">
+        <button 
+          v-for="(_, index) in slides"
+          :key="index"
+          :class="['c-dot', { active: currentSlide === index }]"
+          @click="currentSlide = index"
+        ></button>
+      </div>
     </div>
+
+    <!-- PRODUCTS SECTION -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">Novidades</h2>
+      </div>
+      <div v-if="state.products.length === 0 && !isLoading" class="flex justify-center">
+        <img src="../imgs/no_products.png" class="w-[800px] h-[400px]">
+      </div>
+      <div v-else-if="!isLoading" class="products-grid" v-infinite-scroll="nextPage">
+        <product-view v-for="product in state.products" :key="product._id" :product="product"/>
+      </div>
+      <div v-else class="flex justify-center">
+        <span>Carregando produtos...</span>
+      </div>
+    </div>
+
+    <lof-footer/>
   </div>
 </template>
 
-<script lang="ts" setup>
-import type { User } from '~/types/User'
+<script setup lang="ts">
+import GradientDivisor from '~/components/GradientDivisor.vue';
+import LofFooter from '~/components/LofFooter.vue';
+import type { Product } from '~/types/Product';
+
+const LIMIT = 20
+
+const currentSlide = ref(0)
+const slides = ref([
+  {
+    title: 'Bem-vindo ao Fatecano',
+    description: 'Explore nossa coleção exclusiva de roupas e acessórios',
+    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=1200&h=600&fit=crop'
+  },
+  {
+    title: 'Coleção Premium',
+    description: 'Qualidade e estilo em cada peça',
+    image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1200&h=600&fit=crop'
+  },
+  {
+    title: 'Tendências Atuais',
+    description: 'Fique atualizado com as últimas modas',
+    image: 'https://images.unsplash.com/photo-1485231143210-ce2e5c8d3b6f?w=1200&h=600&fit=crop'
+  }
+])
 
 const state = reactive({
-  email: '',
-  password: '',
+  page: 1,
+  total: 0,
+  products: <Product[]>[]
 })
 
-const isPasswordHidden = ref(false)
 const isLoading = ref(false)
-const authStore = useAuthStore()
 
-async function authUser() {
-  if (!state.email || !state.password) {
-    ElMessage.error('Preencha todos os campos')
-    return
-  }
+onMounted(async () => {
+  await fetchData()
+  
+  // Auto rotate carousel every 5 seconds
+  setInterval(() => {
+    currentSlide.value = (currentSlide.value + 1) % slides.value.length
+  }, 5000)
+})
 
-  isLoading.value = true
-
+async function fetchData() {
   try {
-    const response = await $fetch<User>('/api/user/authUser', {
-      method: 'POST',
-      body: {
-        email: state.email,
-        password: state.password,
-      },
+    isLoading.value = true
+    const result = await $fetch('/api/product/getProductList', {
+      method: 'GET',
+      params: {
+        page: state.page,
+        limit: LIMIT
+      }
     })
 
-    if (!response) {
-      ElMessage.error('Email ou senha incorretos.')
-      return
-    }
-
-    authStore.setUser(response)
-    ElMessage.success('Autenticação realizada com sucesso!')
-    
-    await navigateTo('/homePage')
-  }
-  catch (error: any) {
-    ElMessage.error(error.data?.statusMessage || 'Erro na autenticação')
-    console.error(error)
-  }
-  finally {
+    state.page = result.pagination.page
+    state.total = result.pagination.total
+    state.products = [...state.products, ...result.data as Product[]]
+  } catch(error: any) {
+    ElMessage.error(error.message || 'Erro inesperado')
+  } finally {
     isLoading.value = false
   }
+}
+
+function nextPage() {
+  if (state.page * LIMIT > state.total) return
+  state.page += 1
+  fetchData()
+}
+
+function nextSlide() {
+  currentSlide.value = (currentSlide.value + 1) % slides.value.length
+}
+
+function prevSlide() {
+  currentSlide.value = (currentSlide.value - 1 + slides.value.length) % slides.value.length
 }
 </script>
 
 <style scoped>
 .bg-cream {
   background: #F2EDE6;
-}
-
-el-input {
-  width: 100%;
-}
-
-a {
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-.enter-button {
-  margin-top: 10px;
 }
 </style>
