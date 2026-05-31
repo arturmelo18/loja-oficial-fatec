@@ -1,4 +1,5 @@
 import generateCdnImage from '~/server/utils/helpers/generateCdnImage'
+import { AbacatePayConnector } from '~/server/connectors/AbacatePay/connector'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -27,7 +28,6 @@ export default defineEventHandler(async (event) => {
     }
 
     let finalImageUrl = existingProduct.image
-
     if (image && image !== existingProduct.image) {
       const cdnImg = await generateCdnImage(image)
       finalImageUrl = cdnImg.url || ''
@@ -36,26 +36,42 @@ export default defineEventHandler(async (event) => {
     const updatedProduct = await ProductSchema.findByIdAndUpdate(
       _id,
       {
-        name: name || existingProduct.name,
+        name: name ?? existingProduct.name,
         price: price ?? existingProduct.price,
         quantity: quantity ?? existingProduct.quantity,
-        description: description || existingProduct.description,
+        description: description ?? existingProduct.description,
         image: finalImageUrl,
         active: active ?? existingProduct.active,
       },
       { new: true }
     )
 
-    return {
-      status: 'sucesso',
-      product: updatedProduct,
+    if (existingProduct.abacatePayId) {
+      await AbacatePayConnector.delete('/products/delete', {
+        id: existingProduct.abacatePayId,
+      })
     }
+
+    const abacateProduct = await AbacatePayConnector.post('/products/create', {
+      externalId: updatedProduct!._id.toString(),
+      name:        updatedProduct!.name,
+      price:       Math.round(updatedProduct!.price * 100), // centavos
+      currency:    'BRL',
+      description: updatedProduct!.description,
+      imageUrl:    updatedProduct!.image,
+    })
+
+    await ProductSchema.findByIdAndUpdate(_id, {
+      abacatePayId: abacateProduct.data.id,
+    })
+
+    return { status: 'sucesso' }
 
   } catch (error: any) {
     if (error.statusCode) throw error
-    throw createError({ 
-      statusCode: 500, 
-      statusMessage: 'Erro ao atualizar produto no banco de dados' 
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Erro ao atualizar produto',
     })
   }
 })

@@ -4,6 +4,7 @@ export interface Product {
   price: number
   quantity: number
   active: boolean
+  abacatePayId?: string
   description?: string
   image?: string
   createdAt?: Date

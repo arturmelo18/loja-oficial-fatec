@@ -61,12 +61,16 @@ export default defineEventHandler(async (event) => {
     })
 
     const abacateProduct = await AbacatePayConnector.post('/products/create', {
-      externalId: product._id,
+      externalId: product._id.toString(),
       name: product.name,
-      price: product.price,
+      price: Math.round(product.price * 100),
       currency: 'BRL',
       description: product.description,
       imageUrl: product.image,
+    })
+    
+    await ProductSchema.findByIdAndUpdate(product._id, {
+      abacatePayId: abacateProduct.data.id,
     })
 
     const result = {
