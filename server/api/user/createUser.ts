@@ -74,7 +74,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const newUser = await UserSchema.create({
+    return await UserSchema.create({
       name,
       email,
       password: hashedPassword,
@@ -82,15 +82,6 @@ export default defineEventHandler(async (event) => {
       kind: 'user',
       address,
     })
-
-    return {
-      status: 'sucesso',
-      user: {
-        _id: newUser._id,
-        name: newUser.name,
-        email: newUser.email,
-      },
-    }
   }
   catch (error: any) {
     if (error.statusCode) throw error

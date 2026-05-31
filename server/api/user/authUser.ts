@@ -31,10 +31,5 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  return {
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-    kind: user.kind,
-  }
+  return user
 })
