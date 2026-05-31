@@ -24,8 +24,6 @@ const props = defineProps<{
 
 const imgSrc = props.product.image ? props.product.image : 'https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/shopping_bag/default/48px.svg'
 
-const isWishlisted = ref(false)
-
 const formattedPrice = computed(() =>
   Intl.NumberFormat('pt-BR', {
     minimumFractionDigits: 2,

@@ -125,8 +125,6 @@ async function addToCart() {
     isAdding.value = false
   }
 }
-
-definePageMeta({ middleware: 'auth' })
 </script>
 
 <style scoped>
