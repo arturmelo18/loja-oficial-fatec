@@ -30,23 +30,23 @@ export class AbacatePayConnector {
         }
     }
 
-    static async post(url: string, params: any): Promise<any> {
-        try {
-            const response = await $fetch(`${AbacatePayConnector.getBaseUrl()}${url}`, {
-                method: 'POST',
-                body: params,
-                headers: {
-                    'Authorization': `Bearer ${AbacatePayConnector.getApiKey()}`,
-                    'Content-Type': 'application/json'
-                }
-            })
-            
-            return response
-        } catch (error) {
-            console.error(`Erro ao fazer POST para ${url}:`, error)
-            throw error
-        }
+static async post(url: string, params: any): Promise<any> {
+    try {
+        const response = await $fetch(`${AbacatePayConnector.getBaseUrl()}${url}`, {
+            method: 'POST',
+            body: params,
+            headers: {
+                'Authorization': `Bearer ${AbacatePayConnector.getApiKey()}`,
+                'Content-Type': 'application/json'
+            }
+        })
+        return response
+    } catch (error: any) {
+        console.error(`Erro AbacatePay [${url}]:`, error.data)  // sem JSON.stringify
+        console.error('Payload enviado:', JSON.stringify(params, null, 2))  // loga o que foi enviado
+        throw error
     }
+}
 
     static async put(url: string, params: any): Promise<any> {
         try {

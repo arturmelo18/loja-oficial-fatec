@@ -1,0 +1,64 @@
+import { OrderSchema } from '~/server/models/order'
+import { CartSchema, CartItemSchema } from '~/server/models/cart'
+import { ProductSchema } from '~/server/models/product'
+import { AbacatePayConnector } from '~/server/connectors/AbacatePay/connector'
+
+export default defineEventHandler(async (event) => {
+  const body = await readBody(event)
+
+  if (body.event !== 'checkout.completed') {
+    return { received: true }
+  }
+
+  const { externalId } = body.data.checkout
+
+  const order = await OrderSchema.findOne({ externalId }).populate({
+    path: 'items',
+    populate: { path: 'product' },
+  })
+
+  if (!order) {
+    throw createError({ statusCode: 404, statusMessage: 'Pedido não encontrado' })
+  }
+
+  order.status = 'PAID'
+  await order.save()
+  const items = order.items as any[]
+  for (const item of items) {
+    const product = await ProductSchema.findById(item.product._id)
+    if (!product) continue
+
+    const newQuantity = product.quantity - item.quantity
+
+    await ProductSchema.findByIdAndUpdate(product._id, {
+      quantity: newQuantity,
+    })
+
+    if (product.abacatePayId) {
+      await AbacatePayConnector.delete('/products/delete', {
+        id: product.abacatePayId,
+      })
+    }
+
+    const abacateProduct = await AbacatePayConnector.post('/products/create', {
+      externalId: product._id.toString(),
+      name:        product.name,
+      price:       Math.round(product.price * 100),
+      currency:    'BRL',
+      description: product.description,
+      imageUrl:    product.image,
+    })
+
+    await ProductSchema.findByIdAndUpdate(product._id, {
+      abacatePayId: abacateProduct.data.id,
+    })
+  }
+  const cart = await CartSchema.findOne({ user: order.user })
+  if (cart) {
+    await CartItemSchema.deleteMany({ cartId: cart._id.toString() })
+    cart.items = []
+    await cart.save()
+  }
+
+  return { received: true }
+})
