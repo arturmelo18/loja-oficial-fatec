@@ -97,6 +97,11 @@ onMounted(async () => {
 })
 
 async function addToCart() {
+  if(!authStore.getUser) {
+    ElMessage.info('Para realizar uma compra você precisa estar cadastrado em nosso site.')
+    return
+  }
+
   const cartId = authStore.getCart?._id
   if (!cartId) {
     ElMessage.error('Carrinho não encontrado')
