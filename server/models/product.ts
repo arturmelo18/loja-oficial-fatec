@@ -24,6 +24,10 @@ export const ProductSchema = defineMongooseModel<Product>({
       required: true,
       default: false
     },
+    abacatePayId: {
+      type: String,
+      default: null,
+    },
     description: {
       type: String,
     },
