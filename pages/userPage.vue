@@ -127,13 +127,12 @@ onMounted(() => {
     state._id = user._id
     state.name = user.name
     state.email = user.email
-    console.log(user)
-    state.zipCode = user.address?.zipcode      ?? ''
-    state.uf      = user.address?.state        ?? ''
-    state.city    = user.address?.city         ?? ''
+    state.zipCode = user.address?.zipcode ?? ''
+    state.uf = user.address?.state ?? ''
+    state.city = user.address?.city ?? ''
     state.neighborhood = user.address?.neighborhood ?? ''
-    state.street  = user.address?.street       ?? ''
-    state.number  = user.address?.number       ?? ''
+    state.street = user.address?.street ?? ''
+    state.number = user.address?.number ?? ''
     state.complement = user.address?.complement ?? ''
 })
 
@@ -161,7 +160,7 @@ async function searchAddress() {
 }
 
 async function handleSaveProfile() {
-    if (!state.name || !state.email || !state.password || !state.zipCode || !state.city || !state.neighborhood || !state.street || !state.number) {
+    if (!state.name || !state.email || !state.zipCode || !state.city || !state.neighborhood || !state.street || !state.number) {
         ElMessage.error('Todos os campos obrigatórios devem ser preenchidos.')
         return
     }
