@@ -48,6 +48,7 @@
 
 <script lang="ts" setup>
 import type { User } from '~/types/User'
+import type { Cart } from '~/types/Cart'
 
 const state = reactive({
   email: '',
@@ -80,7 +81,17 @@ async function authUser() {
       return
     }
 
+    
+    const cart = await $fetch<Cart | null>('/api/cart/getCart', {
+      method: 'GET',
+      params: { userId: response._id }
+    }).catch(() => null)
+
     authStore.setUser(response)
+    if (cart) {
+      authStore.setCart(cart)
+    }
+
     ElMessage.success('Autenticação realizada com sucesso!')
     
     await navigateTo('/')
