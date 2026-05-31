@@ -8,17 +8,10 @@
     </div>
     <div class="prod-info">
       <div class="prod-name">{{ product.name }}</div>
-      <div class="prod-cat">{{ product.category || 'Produto' }}</div>
       <div class="prod-price-row">
         <span class="prod-price">R$ {{ formattedPrice }}</span>
       </div>
     </div>
-    <button 
-      class="card-heart" 
-      @click.stop
-      :class="{ active: isWishlisted }"
-      title="Adicionar à lista de desejos"
-    ></button>
   </div>
 </template>
 
