@@ -140,7 +140,7 @@ onMounted(async () => {
         try {
             state.cart = await $fetch('/api/cart/createCart', {
                 method: 'POST',
-                params: { userId },
+                body: { userId },
             })
         } catch (error) {
             console.error('Erro ao criar carrinho')
