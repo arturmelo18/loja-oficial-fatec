@@ -1,17 +1,13 @@
 import { CartSchema } from '~/server/models/cart'
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event)
-
-  if (!body || !body.userId) {
+  const { userId } = await readBody(event)
+  if (!userId) {
     throw createError({
       statusCode: 400,
       statusMessage: 'userId é obrigatório para criar um carrinho',
     })
   }
-
-  const { userId } = body
-
   try {
     const existingCart = await CartSchema.findOne({ user: userId })
     
@@ -27,11 +23,7 @@ export default defineEventHandler(async (event) => {
       items: [],
     })
 
-    return {
-      statusCode: 201,
-      message: 'Carrinho criado com sucesso',
-      cart,
-    }
+    return cart
   } catch (error) {
     throw createError({
       statusCode: 500,

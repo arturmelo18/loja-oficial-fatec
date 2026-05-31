@@ -13,6 +13,8 @@ export interface CartItem {
   _id: string;
   product: Product;
   quantity: number;
+  cartId: string;
+  price: number
   createdAt: Date;
   updatedAt: Date;
 }

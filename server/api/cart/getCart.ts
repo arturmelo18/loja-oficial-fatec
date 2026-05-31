@@ -13,21 +13,17 @@ export default defineEventHandler(async (event) => {
 
   try {
     const filter = userId ? { user: userId } : { _id: cartId }
-    const cart = await CartSchema.findOne(filter).populate('user').populate('items.product')
-
-    if (!cart) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Carrinho não encontrado',
+    const cart = await CartSchema.findOne(filter)
+      .populate('user')
+      .populate({
+        path: 'items',  
+        populate: {
+          path: 'product'
+        }
       })
-    }
 
-    return {
-      statusCode: 200,
-      message: 'Carrinho recuperado com sucesso',
-      cart,
-    }
-  } catch (error) {
+    return cart ?? null 
+  } catch {
     throw createError({
       statusCode: 500,
       statusMessage: 'Erro ao buscar carrinho',

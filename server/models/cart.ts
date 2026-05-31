@@ -15,6 +15,14 @@ export const CartItemSchema = defineMongooseModel<CartItem>({
       required: true,
       min: 1,
     },
+    cartId: {
+      type: String,
+      required: true
+    },
+    price: {
+      type: Number,
+      required: true,
+    }
   },
   options: {
     timestamps: true,
