@@ -1,6 +1,7 @@
 import { CartSchema } from '~/server/models/cart'
 import { OrderSchema } from '~/server/models/order'
 import { AbacatePayConnector } from '~/server/connectors/AbacatePay/connector'
+import { generateSaleCode } from '~/server/utils/generateSaleCode'
 
 export default defineEventHandler(async (event) => {
   const { cartId, userId } = await readBody(event)
@@ -19,6 +20,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const items = cart.items as any[]
+
   for (const item of items) {
     if (item.product.quantity < item.quantity) {
       throw createError({
@@ -38,6 +40,7 @@ export default defineEventHandler(async (event) => {
 
   const total = items.reduce((acc: number, i: any) => acc + i.product.price * i.quantity, 0)
   const externalId = `order-${userId}-${Date.now()}`
+  const saleCode = generateSaleCode()
 
   const abacateResponse = await AbacatePayConnector.post('/checkouts/create', {
     externalId,
@@ -60,6 +63,8 @@ export default defineEventHandler(async (event) => {
     items: cart.items.map((i: any) => i._id),
     total,
     status: 'PENDING',
+    readyForPickup: false,
+    saleCode,
     abacatePayCheckoutId: abacateResponse.data.id,
     abacatePayCheckoutUrl: abacateResponse.data.url,
     externalId,
