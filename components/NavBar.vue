@@ -20,6 +20,10 @@
                 <i class=" uil uil-user"/>
                 <span>Minha Conta</span>
               </el-dropdown-item>
+              <el-dropdown-item class="w-full" @click="navigateTo('/myOrders')">
+                <i class="uil uil-shopping-bag"></i>
+                <span>Meus pedidos</span>
+              </el-dropdown-item>
               <el-dropdown-item class="w-full" @click="navigateTo('/adminPage')" v-if="authStore.getUser?.kind == 'admin'">
                 <i class="uil uil-setting"></i>
                 <span>Área do administrador</span>
