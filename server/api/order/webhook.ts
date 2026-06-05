@@ -42,11 +42,11 @@ export default defineEventHandler(async (event) => {
 
     const abacateProduct = await AbacatePayConnector.post('/products/create', {
       externalId: product._id.toString(),
-      name:        product.name,
-      price:       Math.round(product.price * 100),
-      currency:    'BRL',
+      name: product.name,
+      price: Math.round(product.price * 100),
+      currency: 'BRL',
       description: product.description,
-      imageUrl:    product.image,
+      imageUrl: product.image,
     })
 
     await ProductSchema.findByIdAndUpdate(product._id, {
@@ -55,7 +55,6 @@ export default defineEventHandler(async (event) => {
   }
   const cart = await CartSchema.findOne({ user: order.user })
   if (cart) {
-    await CartItemSchema.deleteMany({ cartId: cart._id.toString() })
     cart.items = []
     await cart.save()
   }
