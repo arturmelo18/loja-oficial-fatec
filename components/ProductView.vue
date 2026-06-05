@@ -3,7 +3,7 @@
     <div class="prod-img-wrap">
       <div class="prod-img-inner">
         <img v-if="imgSrc && !imgSrc.includes('shopping_bag')" :src="imgSrc" :alt="product.name"/>
-        <span v-else class="emoji">👕</span>
+        <i v-else class="uil uil-shopping-bag" style="font-size:48px;opacity:0.2;color:#1A1A1A;"></i>
       </div>
     </div>
     <div class="prod-info">
@@ -22,14 +22,14 @@ const props = defineProps<{
   product: Product
 }>()
 
-const imgSrc = props.product.image ? props.product.image : 'https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/shopping_bag/default/48px.svg'
+const imgSrc = computed(() => props.product.image || null)
 
 const formattedPrice = computed(() =>
   Intl.NumberFormat('pt-BR', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-    useGrouping: false
-  }).format(Number(props.product.price) || 0)
+    useGrouping: true,
+  }).format((Number(props.product.price) || 0) / 100)
 )
 
 function goToDetailView() {

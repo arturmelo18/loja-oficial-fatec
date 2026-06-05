@@ -54,7 +54,7 @@
                             <el-input 
                                 id="product-price" 
                                 placeholder="0,00" 
-                                v-model="state.product.price"
+                                v-model="displayPrice"
                             >
                                 <template #prefix>
                                     <span class="input-currency-prefix">R$</span>
@@ -109,7 +109,7 @@ definePageMeta({
 const state = reactive({
   product: {
     name: "",
-    price: "",
+    price: 0,
     quantity: 1,
     description: "",
     image: "",
@@ -143,47 +143,39 @@ onMounted(async () => {
 
 const handleSave = async () => {
   if (!state.product.name || !state.product.price) {
-    ElMessage.warning("Preencha os campos obrigatórios");
-    return;
+    ElMessage.warning("Preencha os campos obrigatórios")
+    return
   }
 
-  isLoading.value = true;
+  isLoading.value = true
   try {
     if (selectedFile.value) {
-      state.product.image = await fileToBase64(selectedFile.value);
+      state.product.image = await fileToBase64(selectedFile.value)
+    }
+
+    const body = {
+      ...state.product,
+      price: state.isNew
+        ? Math.round(state.product.price * 100)   // novo: converte reais → centavos
+        : state.product.price,                     // edição: já está em centavos
     }
 
     if (state.isNew) {
-      try {
-        await $fetch('/api/product/createProduct', {
-          method: 'POST',
-          body: state.product
-        })
-        ElMessage.success('Produto criado com sucesso!')
-      } catch (e: any) {
-        ElMessage.error('Erro ao criar produto')
-      }
+      await $fetch('/api/product/createProduct', { method: 'POST', body })
+      ElMessage.success('Produto criado com sucesso!')
     } else {
-        try {
-          await $fetch('/api/product/updateProduct', {
-            method: 'PUT',
-            body: state.product
-          })
-          ElMessage.success('Produto atualizado com sucesso!')
-        } catch (e: any) {
-          ElMessage.error('Erro ao atualizar produto')
-        }
+      await $fetch('/api/product/updateProduct', { method: 'PUT', body })
+      ElMessage.success('Produto atualizado com sucesso!')
     }
-    
+
     navigateTo('/adminPage')
-    
   } catch (e: any) {
     console.error(e)
     ElMessage.error(e.statusMessage || 'Erro ao salvar')
   } finally {
     isLoading.value = false
   }
-};
+}
 
 const handleImageChange = (uploadFile: UploadFile) => {
   if (!uploadFile.raw) return;
@@ -196,6 +188,11 @@ const handleImageChange = (uploadFile: UploadFile) => {
   selectedFile.value = uploadFile.raw;
   state.product.image = URL.createObjectURL(uploadFile.raw);
 };
+
+const displayPrice = computed({
+  get: () => state.isNew ? state.product.price : state.product.price / 100,
+  set: (val) => { state.product.price = state.isNew ? val : val * 100 }
+})
 </script>
 
 <style lang="css" scoped>

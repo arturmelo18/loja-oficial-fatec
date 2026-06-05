@@ -16,14 +16,17 @@ export default defineEventHandler(async (event) => {
     const cart = await CartSchema.findOne(filter)
       .populate('user')
       .populate({
-        path: 'items',  
+        path: 'items',
+        model: 'CartItem',
         populate: {
-          path: 'product'
-        }
+          path: 'product',
+          model: 'Product',
+        },
       })
 
-    return cart ?? null 
-  } catch {
+    return cart ?? null
+  } catch (e) {
+    console.error('Erro getCart:', e)
     throw createError({
       statusCode: 500,
       statusMessage: 'Erro ao buscar carrinho',

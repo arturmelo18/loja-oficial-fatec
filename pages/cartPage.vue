@@ -25,30 +25,23 @@
                         <span class="items-count">{{ totalItems }} produto{{ totalItems !== 1 ? 's' : '' }}</span>
                     </span>
 
-                    <div
-                        v-for="item in state.cart.items"
-                        :key="item._id"
-                        class="cart-item"
-                    >
+                    <div v-for="item in state.cart.items" :key="item._id" class="cart-item">
                         <div class="item-image">
                             <img
-                                v-if="item.product.image"
+                                v-if="item.product?.image"
                                 :src="item.product.image"
-                                :alt="item.product.name"
+                                :alt="item.product?.name"
                             />
-                            <i v-else class="ti ti-shirt"></i>
+                            <i v-else class="uil uil-shopping-bag"></i>
                         </div>
 
                         <div class="item-body">
-                            <span class="item-name">{{ item.product.name }}</span>
-                            <span class="item-ref">REF: {{ item.product._id.slice(-6).toUpperCase() }}</span>
+                            <span class="item-name">{{ item.product?.name }}</span>
+                            <span class="item-ref">REF: {{ item.product?._id?.slice(-6).toUpperCase() }}</span>
                             <span class="item-price">{{ formatPrice(calculateItemPrice(item)) }}</span>
 
                             <div class="item-actions">
                                 <div class="qty-ctrl">
-                                    <button class="btn-remove" :disabled="isUpdating" @click="removeItem(item._id)">
-                                        <i class="ti ti-trash"></i>
-                                    </button>
                                     <button
                                         class="qty-btn"
                                         :disabled="item.quantity <= 1 || isUpdating"
@@ -58,12 +51,12 @@
                                     <span class="qty-val">{{ item.quantity }}</span>
                                     <button
                                         class="qty-btn"
-                                        :disabled="item.quantity >= item.product.quantity || isUpdating"
+                                        :disabled="item.quantity >= (item.product?.quantity ?? 0) || isUpdating"
                                         @click="updateQuantity(item, item.quantity + 1)"
                                         aria-label="Aumentar quantidade"
                                     >+</button>
                                 </div>
-                                <button class="btn-remove" @click="removeItem(item._id)">
+                                <button class="btn-remove" :disabled="isUpdating" @click="removeItem(item._id)">
                                     <i class="ti ti-trash"></i> Remover
                                 </button>
                             </div>
@@ -77,11 +70,11 @@
 
                     <div class="summary-row">
                         <span>Subtotal ({{ totalItems }} {{ totalItems !== 1 ? 'itens' : 'item' }})</span>
-                        <span>{{ formatPrice(subtotal) }}</span>
+                        <span>{{ formatPrice(subtotal / 100) }}</span>
                     </div>
                     <div class="summary-row total">
                         <span>Total</span>
-                        <span class="total-price">{{ formatPrice(subtotal) }}</span>
+                        <span class="total-price">{{ formatPrice(subtotal / 100) }}</span>
                     </div>
 
                     <el-button class="btn-primary w-full" @click="checkout">
@@ -105,23 +98,30 @@ import type { Cart, CartItem } from '~/types/Cart'
 
 const authStore = useAuthStore()
 const isUpdating = ref(false)
+const isLoading = ref(false)
 
 const state = reactive({
     cart: null as Cart | null,
 })
-
-const isLoading = ref(false)
 
 const totalItems = computed(() =>
     state.cart?.items.reduce((acc, item) => acc + item.quantity, 0) ?? 0
 )
 
 const subtotal = computed(() =>
-    state.cart?.items.reduce((acc, item) => acc + item.product.price * item.quantity, 0) ?? 0
+    state.cart?.items.reduce((acc, item) => {
+        const price = item.price ?? item.product?.price ?? 0
+        return acc + price * item.quantity
+    }, 0) ?? 0
 )
 
 const formatPrice = (value: number) =>
     value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+
+function calculateItemPrice(item: CartItem): number {
+    const price = item.price ?? item.product?.price ?? 0
+    return (price * item.quantity) / 100
+}
 
 onMounted(async () => {
     isLoading.value = true
@@ -132,8 +132,9 @@ onMounted(async () => {
             method: 'GET',
             params: { userId },
         })
-    } catch {
-        console.log('Usuário não tem carrinho, criando...')
+        console.log('cart:', JSON.stringify(state.cart?.items?.[0], null, 2))
+    } catch (e) {
+        console.error('erro getCart:', e)
     }
 
     if (!state.cart) {
@@ -142,23 +143,27 @@ onMounted(async () => {
                 method: 'POST',
                 body: { userId },
             })
-        } catch (error) {
-            console.error('Erro ao criar carrinho')
+        } catch (e) {
+            console.error('Erro ao criar carrinho:', e)
         }
     }
-    authStore.setCart(state.cart as Cart)
+
+    if (state.cart) authStore.setCart(state.cart)
     isLoading.value = false
 })
 
 async function updateQuantity(item: CartItem, newQty: number) {
-    if (newQty < 1 || newQty > item.product.quantity) return
+    if (newQty < 1 || newQty > (item.product?.quantity ?? 0)) return
     isUpdating.value = true
     try {
         await $fetch('/api/cart/items/updateItem', {
             method: 'PATCH',
             body: { cartItemId: item._id, quantity: newQty },
         })
-        item.quantity = newQty
+        const index = state.cart!.items.findIndex(i => i._id === item._id)
+        if (index !== -1) {
+            state.cart!.items[index] = { ...state.cart!.items[index], quantity: newQty } as CartItem
+        }
     } catch {
         ElMessage.error('Erro ao atualizar quantidade')
     } finally {
@@ -177,10 +182,6 @@ async function removeItem(cartItemId: string) {
     } catch {
         ElMessage.error('Erro ao remover item')
     }
-}
-
-function calculateItemPrice(item: CartItem) {
-    return item.quantity * item.product.price
 }
 
 function checkout() {
@@ -212,10 +213,11 @@ definePageMeta({ middleware: 'auth' })
 }
 
 .page-title {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-size: 28px;
-    font-weight: 600;
-    color: #4a0f01;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 38px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--black);
     margin-bottom: 2rem;
 }
 
@@ -228,26 +230,24 @@ definePageMeta({ middleware: 'auth' })
 
 .card {
     background: #fff;
-    border-radius: 12px;
-    padding: 1.75rem;
-    border: 0.5px solid rgba(74, 15, 1, 0.07);
+    border: 1px solid var(--border);
+    overflow: hidden;
 }
 
 .section-title {
     display: block;
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: 'Cormorant Garamond', Georgia, serif;
     font-size: 18px;
-    font-weight: 600;
-    color: #4a0f01;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid rgba(74, 15, 1, 0.08);
-    margin-bottom: 1.25rem;
+    font-weight: 400;
+    color: var(--black);
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
 }
 
 .items-count {
-    font-family: system-ui, sans-serif;
+    font-family: var(--font-body);
     font-size: 13px;
-    color: #999;
+    color: var(--gray);
     font-weight: 400;
     margin-left: 8px;
 }
@@ -256,24 +256,22 @@ definePageMeta({ middleware: 'auth' })
     display: grid;
     grid-template-columns: 96px 1fr;
     gap: 1.25rem;
-    padding: 1.25rem 0;
-    border-bottom: 1px solid rgba(74, 15, 1, 0.06);
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
 }
 
 .cart-item:last-child {
     border-bottom: none;
-    padding-bottom: 0;
 }
 
 .item-image {
     width: 96px;
     height: 96px;
-    border-radius: 8px;
-    background: #F2EDE6;
+    background: var(--cream-dark);
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 0.5px solid rgba(74, 15, 1, 0.1);
+    border: 1px solid var(--border);
     overflow: hidden;
 }
 
@@ -297,34 +295,35 @@ definePageMeta({ middleware: 'auth' })
 .item-name {
     font-size: 15px;
     font-weight: 500;
-    color: #1a1a1a;
+    color: var(--black);
     line-height: 1.4;
 }
 
 .item-ref {
-    font-size: 12px;
-    color: #aaa;
+    font-size: 11px;
+    color: var(--gray);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
 .item-price {
-    font-size: 17px;
-    font-weight: 600;
-    color: #4a0f01;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--black);
 }
 
 .item-actions {
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin-top: 6px;
+    margin-top: 8px;
 }
 
 .qty-ctrl {
     display: flex;
     align-items: center;
-    border: 1px solid rgba(74, 15, 1, 0.2);
-    border-radius: 6px;
-    overflow: hidden;
+    border: 1px solid var(--border);
 }
 
 .qty-btn {
@@ -334,30 +333,24 @@ definePageMeta({ middleware: 'auth' })
     border: none;
     cursor: pointer;
     font-size: 16px;
-    color: #4a0f01;
+    color: var(--black);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: background 0.15s;
 }
 
-.qty-btn:hover:not(:disabled) {
-    background: rgba(74, 15, 1, 0.05);
-}
-
-.qty-btn:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-}
+.qty-btn:hover:not(:disabled) { background: var(--cream-dark); }
+.qty-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
 .qty-val {
     width: 36px;
     text-align: center;
     font-size: 14px;
     font-weight: 500;
-    color: #1a1a1a;
-    border-left: 1px solid rgba(74, 15, 1, 0.15);
-    border-right: 1px solid rgba(74, 15, 1, 0.15);
+    color: var(--black);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
     line-height: 32px;
 }
 
@@ -365,90 +358,80 @@ definePageMeta({ middleware: 'auth' })
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 13px;
-    color: #aaa;
+    font-size: 12px;
+    color: var(--gray);
     display: flex;
     align-items: center;
     gap: 4px;
     padding: 4px 0;
     transition: color 0.15s;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
-.btn-remove:hover {
-    color: #c0392b;
+.btn-remove:hover { color: #c0392b; }
+.btn-remove:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.cart-summary {
+    padding: 0;
 }
 
 .summary-row {
     display: flex;
     justify-content: space-between;
     font-size: 14px;
-    color: #555;
-    margin-bottom: 12px;
+    color: var(--gray);
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid var(--border);
 }
 
 .summary-row.total {
     font-size: 17px;
-    font-weight: 600;
-    color: #1a1a1a;
-    padding-top: 12px;
-    margin-top: 4px;
-    border-top: 1px solid rgba(74, 15, 1, 0.1);
-    margin-bottom: 0;
+    font-weight: 500;
+    color: var(--black);
+    padding: 1rem 1.5rem;
 }
 
-.free-shipping { color: #2d7a3a; font-weight: 500; }
-.total-price { color: #4a0f01; }
+.total-price { color: var(--black); }
 
 .btn-primary {
-    width: 100%;
-    background: #4a0f01;
-    border-color: #4a0f01;
-    color: #fff;
+    display: block;
+    width: calc(100% - 3rem);
+    margin: 1.25rem 1.5rem;
+    background: var(--black) !important;
+    border-color: var(--black) !important;
+    color: #fff !important;
+    font-size: 12px;
     font-weight: 500;
-    border-radius: 8px;
-    padding: 12px;
-    margin-top: 1.25rem;
-    font-size: 15px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 0 !important;
+    padding: 13px !important;
+    transition: all 0.3s;
 }
 
-.btn-primary:hover { background: #631402; }
+.btn-primary:hover {
+    background: var(--burgundy) !important;
+    border-color: var(--burgundy) !important;
+}
 
 .security-note {
     display: flex;
     align-items: center;
     gap: 6px;
     justify-content: center;
-    margin-top: 1rem;
+    padding-bottom: 1.25rem;
     font-size: 12px;
-    color: #aaa;
+    color: var(--gray);
 }
 
-.empty-state {
-    text-align: center;
-    padding: 5rem 2rem;
-}
-
-.empty-state i {
-    font-size: 56px;
-    color: #c0a090;
-    display: block;
-    margin-bottom: 1rem;
-}
-
-.empty-state p {
-    color: #888;
-    font-size: 16px;
-    margin-bottom: 1.5rem;
-}
-
+.empty-state { text-align: center; padding: 5rem 2rem; }
+.empty-state i { font-size: 56px; color: #c0a090; display: block; margin-bottom: 1rem; }
+.empty-state p { color: var(--gray); font-size: 15px; margin-bottom: 1.5rem; }
 .loading-state { padding: 2rem 0; }
 
 @media (max-width: 900px) {
-    .cart-layout {
-        grid-template-columns: 1fr;
-    }
-    .cart-main {
-        padding: 1.5rem 1rem;
-    }
+    .cart-layout { grid-template-columns: 1fr; }
+    .cart-main { padding: 1.5rem 1rem; }
 }
 </style>

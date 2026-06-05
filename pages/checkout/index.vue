@@ -12,7 +12,7 @@
           <div v-for="item in cartItems" :key="item._id" class="order-item">
             <span class="order-item-name">{{ item.product.name }}</span>
             <span class="order-item-qty">× {{ item.quantity }}</span>
-            <span class="order-item-price">{{ formatPrice(item.product.price * item.quantity) }}</span>
+            <span class="order-item-price">{{ formatPrice((item.price ?? item.product.price) * item.quantity) }}</span>
           </div>
 
           <div class="order-total">
@@ -57,11 +57,11 @@ const cart = computed(() => authStore.getCart)
 const cartItems = computed(() => (cart.value?.items ?? []) as CartItem[])
 
 const total = computed(() =>
-  cartItems.value.reduce((acc, i) => acc + i.product.price * i.quantity, 0)
+  cartItems.value.reduce((acc, i) => acc + (i.price ?? i.product.price) * i.quantity, 0)
 )
 
 const formatPrice = (value: number) =>
-  value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+  (value / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
 async function goToPayment() {
   if (!cart.value?._id || !user.value?._id) {

@@ -12,9 +12,7 @@
             :src="imgSrc"
             :alt="state.product.name"
           />
-          <div v-else class="img-placeholder">
-            <i class="ti ti-shirt"></i>
-          </div>
+          <i v-else class="uil uil-shopping-bag" style="font-size:48px;opacity:0.2;color:#1A1A1A;"></i>
         </div>
 
         <div class="modal-body-side">
@@ -81,7 +79,7 @@ const formattedPrice = computed(() =>
   Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
-  }).format((Number(state.product.price) || 0) * state.saleQtd)
+  }).format((Number(state.product.price) || 0) / 100)
 )
 
 onMounted(async () => {
