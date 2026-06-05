@@ -59,23 +59,8 @@ import type { Product } from '~/types/Product';
 const LIMIT = 20
 
 const currentSlide = ref(0)
-const slides = ref([
-  {
-    title: 'Bem-vindo ao Fatecano',
-    description: 'Explore nossa coleção exclusiva de roupas e acessórios',
-    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=1200&h=600&fit=crop'
-  },
-  {
-    title: 'Coleção Premium',
-    description: 'Qualidade e estilo em cada peça',
-    image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1200&h=600&fit=crop'
-  },
-  {
-    title: 'Tendências Atuais',
-    description: 'Fique atualizado com as últimas modas',
-    image: 'https://images.unsplash.com/photo-1485231143210-ce2e5c8d3b6f?w=1200&h=600&fit=crop'
-  }
-])
+const slides = ref<{ title: string; description: string; image: string }[]>([])
+const storeName = ref('')
 
 const state = reactive({
   page: 1,
@@ -86,12 +71,23 @@ const state = reactive({
 const isLoading = ref(false)
 
 onMounted(async () => {
+  try {
+    const store = await $fetch<any>('/api/store/getStore')
+    if (store) {
+      slides.value = store.slides
+      storeName.value = store.name
+    }
+  } catch {
+    // fallback vazio — carrossel não aparece
+  }
+
   await fetchData()
-  
-  // Auto rotate carousel every 5 seconds
-  setInterval(() => {
-    currentSlide.value = (currentSlide.value + 1) % slides.value.length
-  }, 5000)
+
+  if (slides.value.length > 1) {
+    setInterval(() => {
+      currentSlide.value = (currentSlide.value + 1) % slides.value.length
+    }, 5000)
+  }
 })
 
 async function fetchData() {
