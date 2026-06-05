@@ -22,6 +22,12 @@
 </template>
 
 <script setup lang="ts">
+const authStore = useAuthStore()
+
+onMounted(() => {
+  authStore.clearCart()
+})
+
 definePageMeta({ middleware: 'auth' })
 </script>
 

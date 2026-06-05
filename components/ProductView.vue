@@ -1,39 +1,40 @@
 <template>
-  <div class="product-card" @click="goToDetailView">
+  <div class="product-card" :class="{ 'product-unavailable': !product.quantity }" @click="goToDetailView">
     <div class="prod-img-wrap">
       <div class="prod-img-inner">
-        <img v-if="imgSrc && !imgSrc.includes('shopping_bag')" :src="imgSrc" :alt="product.name"/>
+        <img v-if="imgSrc" :src="imgSrc" :alt="product.name"/>
         <i v-else class="uil uil-shopping-bag" style="font-size:48px;opacity:0.2;color:#1A1A1A;"></i>
+      </div>
+      <div v-if="!product.quantity" class="unavailable-overlay">
+        <span>Indisponível</span>
       </div>
     </div>
     <div class="prod-info">
       <div class="prod-name">{{ product.name }}</div>
       <div class="prod-price-row">
-        <span class="prod-price">R$ {{ formattedPrice }}</span>
+        <span class="prod-price">{{ formattedPrice }}</span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { Product } from '~/types/Product';
+import type { Product } from '~/types/Product'
 
-const props = defineProps<{
-  product: Product
-}>()
+const props = defineProps<{ product: Product }>()
 
 const imgSrc = computed(() => props.product.image || null)
 
 const formattedPrice = computed(() =>
   Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-    useGrouping: true,
   }).format((Number(props.product.price) || 0) / 100)
 )
 
 function goToDetailView() {
-  if (!props.product._id) return
+  if (!props.product._id || !props.product.quantity) return  // ← bloqueia clique
   navigateTo({
     path: '/productDetailView',
     query: { _id: props.product._id },
@@ -48,8 +49,12 @@ function goToDetailView() {
   transition: transform 0.3s ease;
 }
 
-.product-card:hover {
+.product-card:not(.product-unavailable):hover {
   transform: translateY(-2px);
+}
+
+.product-unavailable {
+  cursor: not-allowed;
 }
 
 .prod-img-wrap {
@@ -71,7 +76,7 @@ function goToDetailView() {
   justify-content: center;
 }
 
-.product-card:hover .prod-img-inner {
+.product-card:not(.product-unavailable):hover .prod-img-inner {
   transform: scale(1.04);
 }
 
@@ -81,8 +86,34 @@ function goToDetailView() {
   object-fit: cover;
 }
 
-.emoji {
-  font-size: 60px;
-  opacity: 0.2;
+.unavailable-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.unavailable-overlay span {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 6px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.product-unavailable .prod-img-inner img,
+.product-unavailable .prod-img-inner i {
+  filter: grayscale(100%);
+  opacity: 0.6;
+}
+
+.product-unavailable .prod-name,
+.product-unavailable .prod-price {
+  color: #aaa;
 }
 </style>

@@ -7,6 +7,7 @@
         <div class="adm-sidebar-title">Painel Admin</div>
         <ul class="adm-nav">
           <li><a @click="loadDashboard(); currentSection = 'dashboard'" :class="{ active: currentSection === 'dashboard' }">Dashboard</a></li>
+          <li><a @click="loadStore(); currentSection = 'loja'" :class="{ active: currentSection === 'loja' }">Loja</a></li> 
           <li><a @click="loadUsers(); currentSection = 'usuarios'" :class="{ active: currentSection === 'usuarios' }">Usuários</a></li>
           <li><a @click="loadAllOrders(); currentSection = 'pedidos'" :class="{ active: currentSection === 'pedidos' }">Pedidos</a></li>
           <li><a @click="currentSection = 'produtos'" :class="{ active: currentSection === 'produtos' }">Produtos</a></li>
@@ -164,7 +165,7 @@
                 <tr v-for="product in state.products" :key="product._id">
                   <td><img :src="product.image" class="product-image" /></td>
                   <td>{{ product.name }}</td>
-                  <td>R${{ product.price }}</td>
+                  <td>{{ formatPrice(product.price / 100) }}</td>
                   <td>{{ product.quantity }}</td>
                   <td>
                     <div class="action-buttons">
@@ -283,6 +284,97 @@
           <div v-else><span>Carregando pedidos...</span></div>
         </div>
 
+        <!-- Loja -->
+        <div v-if="currentSection === 'loja'">
+          <div class="adm-title">Configurações da Loja</div>
+
+          <div v-if="isLoadingStore" style="padding: 2rem 0;">
+            <el-skeleton :rows="4" animated />
+          </div>
+
+          <div v-else class="products-table-container" style="max-width: 700px;">
+            <div style="margin-bottom: 1.5rem;">
+              <label class="filter-group" style="display:flex;flex-direction:column;gap:4px;margin-bottom:1rem;">
+                <span style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:#6B6B6B;font-weight:500;">
+                  Nome da Loja
+                </span>
+                <el-input v-model="storeForm.name" placeholder="Ex: Fatecano" />
+              </label>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+              <span style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:#6B6B6B;font-weight:500;display:block;margin-bottom:1rem;">
+                Slides do Carrossel
+              </span>
+
+              <div
+                v-for="(slide, index) in storeForm.slides"
+                :key="index"
+                class="slide-editor"
+              >
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
+                  <span style="font-size:13px;font-weight:500;color:#333;">Slide {{ index + 1 }}</span>
+                  <el-button
+                    size="small"
+                    type="danger"
+                    plain
+                    @click="removeSlide(index)"
+                    :disabled="storeForm.slides.length <= 1"
+                  >
+                    Remover
+                  </el-button>
+                </div>
+
+                <div style="display:flex;flex-direction:column;gap:0.75rem;">
+                  <div>
+                    <label style="font-size:12px;color:#6B6B6B;display:block;margin-bottom:4px;">Título</label>
+                    <el-input v-model="slide.title" placeholder="Ex: Bem-vindo ao Fatecano" />
+                  </div>
+                  <div>
+                    <label style="font-size:12px;color:#6B6B6B;display:block;margin-bottom:4px;">Descrição</label>
+                    <el-input v-model="slide.description" placeholder="Subtítulo do slide" />
+                  </div>
+                  <div>
+                    <label style="font-size:12px;color:#6B6B6B;display:block;margin-bottom:4px;">Imagem</label>
+                    <div style="display:flex;gap:12px;align-items:center;">
+                      <el-upload
+                        action="#"
+                        :show-file-list="false"
+                        :auto-upload="false"
+                        :on-change="(file: any) => handleSlideImage(file, index)"
+                      >
+                        <el-button size="small">Selecionar imagem</el-button>
+                      </el-upload>
+                      <img
+                        v-if="slide.image"
+                        :src="slide.image"
+                        style="width:80px;height:45px;object-fit:cover;border-radius:4px;border:1px solid #ddd;"
+                      />
+                      <span v-else style="font-size:12px;color:#aaa;">Nenhuma imagem</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <el-button
+                style="margin-top:1rem;width:100%;"
+                @click="addSlide"
+                :disabled="storeForm.slides.length >= 5"
+              >
+                + Adicionar Slide
+              </el-button>
+            </div>
+
+            <el-button
+              class="btn-primary"
+              style="width:100%;margin-top:1rem;"
+              :disabled="isSavingStore"
+              @click="saveStore"
+            >
+              {{ isSavingStore ? 'Salvando...' : 'Salvar Configurações' }}
+            </el-button>
+          </div>
+        </div>
       </main>
     </div>
   </div>
@@ -642,6 +734,81 @@ async function loadAllProducts() {
   allProducts.value = result.data as Product[]
 }
 
+import type { Store, StoreSlide } from '~/types/Store'
+
+const isLoadingStore = ref(false)
+const isSavingStore  = ref(false)
+
+const storeForm = reactive({
+  name: '',
+  slides: [] as StoreSlide[],
+})
+
+async function loadStore() {
+  isLoadingStore.value = true
+  try {
+    const store = await $fetch<Store | null>('/api/store/getStore')
+    if (store) {
+      storeForm.name   = store.name
+      storeForm.slides = store.slides
+    } else {
+      // default se não existir ainda
+      storeForm.name   = 'Fatecano'
+      storeForm.slides = [{ title: '', description: '', image: '' }]
+    }
+  } catch {
+    ElMessage.error('Erro ao carregar configurações da loja')
+  } finally {
+    isLoadingStore.value = false
+  }
+}
+
+function addSlide() {
+  storeForm.slides.push({ title: '', description: '', image: '' })
+}
+
+function removeSlide(index: number) {
+  storeForm.slides.splice(index, 1)
+}
+
+function handleSlideImage(uploadFile: any, index: number) {
+  if (!uploadFile.raw) return
+  if (uploadFile.raw.size / 1024 / 1024 > 2) {
+    ElMessage.error('A imagem não pode passar de 2MB')
+    return
+  }
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    storeForm.slides[index].image = e.target?.result as string
+  }
+  reader.readAsDataURL(uploadFile.raw)
+}
+
+async function saveStore() {
+  if (!storeForm.name) {
+    ElMessage.error('Nome da loja é obrigatório')
+    return
+  }
+  const invalid = storeForm.slides.some(s => !s.title || !s.image)
+  if (invalid) {
+    ElMessage.error('Todos os slides precisam de título e imagem')
+    return
+  }
+
+  isSavingStore.value = true
+  try {
+    await $fetch('/api/store/updateStore', {
+      method: 'PUT',
+      body: { name: storeForm.name, slides: storeForm.slides },
+    })
+    ElMessage.success('Loja atualizada com sucesso!')
+  } catch (e: any) {
+    ElMessage.error(e.data?.statusMessage || 'Erro ao salvar')
+  } finally {
+    isSavingStore.value = false
+  }
+}
+
 // ── Init ──────────────────────────────────────────────────
 
 definePageMeta({ middleware: 'auth' })
@@ -758,5 +925,13 @@ onMounted(() => {
 .chart-empty i {
   font-size: 36px;
   color: #D4CBBD;
+}
+
+.slide-editor {
+  background: #faf9f7;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
 }
 </style>
