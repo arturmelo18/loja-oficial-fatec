@@ -1,5 +1,5 @@
 import { AbacatePayConnector } from '~/server/connectors/AbacatePay/connector'
-import generateCdnImage from '~/server/utils/helpers/generateCdnImage'
+import { generateCdnImage } from '~/server/utils/helpers/generateCdnImage'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -68,7 +68,7 @@ export default defineEventHandler(async (event) => {
       description: product.description,
       imageUrl: product.image,
     })
-    
+
     await ProductSchema.findByIdAndUpdate(product._id, {
       abacatePayId: abacateProduct.data.id,
     })
