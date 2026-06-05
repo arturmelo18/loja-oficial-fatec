@@ -15,30 +15,31 @@
           <i class="uil uil-bars"></i>
         </el-button>
         <template #dropdown> 
-            <div class="flex flex-col items-start" v-if="authStore.getUser">
-              <el-dropdown-item class="w-full" @click="navigateTo('/userPage')">
-                <i class=" uil uil-user"/>
-                <span>Minha Conta</span>
-              </el-dropdown-item>
-              <el-dropdown-item class="w-full" @click="navigateTo('/myOrders')">
-                <i class="uil uil-shopping-bag"></i>
-                <span>Meus pedidos</span>
-              </el-dropdown-item>
-              <el-dropdown-item class="w-full" @click="navigateTo('/adminPage')" v-if="authStore.getUser?.kind == 'admin'">
-                <i class="uil uil-setting"></i>
-                <span>Área do administrador</span>
-              </el-dropdown-item>
-              <el-dropdown-item class="w-full" @click="logout">
-                <i class="uil uil-signout"></i>
-                <span>Sair</span>
-              </el-dropdown-item>
-            </div>
-            <div class="flex flex-col items-start" v-else>
-              <el-dropdown-item class="w-full" @click="navigateTo('/loginPage')"">
-                <i class="uil uil-signin"></i>
-                <span>Entrar</span>
-              </el-dropdown-item>
-            </div>
+          <el-dropdown-menu class="flex flex-col items-start" v-if="authStore.getUser">
+            <el-dropdown-item class="w-full" @click="navigateTo('/userPage')">
+              <i class="uil uil-user"></i>
+              <span>Minha Conta</span>
+            </el-dropdown-item>
+            <el-dropdown-item class="w-full" @click="navigateTo('/myOrders')">
+              <i class="uil uil-shopping-bag"></i>
+              <span>Meus pedidos</span>
+            </el-dropdown-item>
+            <el-dropdown-item class="w-full" @click="navigateTo('/adminPage')" v-if="authStore.getUser?.kind == 'admin'">
+              <i class="uil uil-setting"></i>
+              <span>Área do administrador</span>
+            </el-dropdown-item>
+            <el-dropdown-item class="w-full" @click="logout">
+              <i class="uil uil-signout"></i>
+              <span>Sair</span>
+            </el-dropdown-item>
+          </el-dropdown-menu>
+          
+          <el-dropdown-menu class="flex flex-col items-start" v-else>
+            <el-dropdown-item class="w-full" @click="navigateTo('/loginPage')">
+              <i class="uil uil-signin"></i>
+              <span>Entrar</span>
+            </el-dropdown-item>
+          </el-dropdown-menu>
         </template>
       </el-dropdown>
     </div>
