@@ -7,6 +7,8 @@ export interface Order {
   items: CartItem[]
   total: number
   status: 'PENDING' | 'PAID' | 'EXPIRED' | 'CANCELLED' | 'REFUNDED'
+  readyForPickup: boolean
+  saleCode: string
   abacatePayCheckoutId: string
   abacatePayCheckoutUrl: string
   externalId: string

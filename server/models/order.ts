@@ -25,6 +25,16 @@ export const OrderSchema = defineMongooseModel<Order>({
       enum: ['PENDING', 'PAID', 'EXPIRED', 'CANCELLED', 'REFUNDED'],
       default: 'PENDING',
     },
+    readyForPickup: {
+      type: Boolean,
+      default: false,
+    },
+    saleCode: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+    },
     abacatePayCheckoutId: {
       type: String,
       required: true,
