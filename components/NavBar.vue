@@ -1,7 +1,7 @@
 <template>
   <nav class="flex space-between">
     <div class="nav-logo">
-      <nuxt-link to="/">Fatecano</nuxt-link>
+      <nuxt-link to="/">{{ storeName }}</nuxt-link>
     </div>
     <ul class="nav-links" id="nav-links-desktop">
       <li><nuxt-link to="/">Todos os produtos</nuxt-link></li>
@@ -48,6 +48,16 @@
 
 <script setup lang="ts">
 const authStore = useAuthStore()
+const storeName = ref('Fatecano')
+
+onMounted(async () => {
+  try {
+    const store = await $fetch<any>('/api/store/getStore')
+    if (store?.name) storeName.value = store.name
+  } catch {
+    // mantém o fallback 'Fatecano'
+  }
+})
 
 const logout = () => {
   authStore.clearUser()
