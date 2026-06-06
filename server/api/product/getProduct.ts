@@ -7,13 +7,13 @@ export default defineEventHandler(async (event) => {
       statusMessage: `${event}`,
     })
   }
-  
+
   const product = await ProductSchema.findOne({
-    _id: _id
+    _id: _id,
   })
 
   if (!product) {
-     throw createError({
+    throw createError({
       statusCode: 404,
       statusMessage: 'Produto não encontrado.',
     })

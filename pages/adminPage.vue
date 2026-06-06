@@ -170,7 +170,7 @@
                   <td>
                     <div class="action-buttons">
                       <el-button class="edit-button" @click="goToEditProduct(product._id)">Editar</el-button>
-                      <el-button class="delete-button mx-1" @click="deleteProduct(product._id)">
+                      <el-button class="delete-button mx-1" @click="inativeProduct(product._id)">
                         <i class="uil uil-trash-alt text-red-800 text-2xl"></i>
                       </el-button>
                     </div>
@@ -609,7 +609,7 @@ const goToEditProduct = (productId?: string) => {
   navigateTo({ path: '/productPage', query: { _id: productId } })
 }
 
-async function deleteProduct(productId?: string) {
+async function inativeProduct(productId?: string) {
   if (!productId) return
   try {
     await ElMessageBox.confirm('Você quer realmente excluir o produto?', 'Atenção', {
@@ -617,7 +617,7 @@ async function deleteProduct(productId?: string) {
       cancelButtonText: 'Não',
       confirmButtonClass: 'el-button--danger',
     })
-    await $fetch('/api/product/deleteProduct', { method: 'DELETE', body: { productId } })
+    await $fetch('/api/product/inativeProduct', { method: 'PUT', body: { productId } })
     ElMessage.success('Produto excluído com sucesso!')
     searchProducts(true)
   } catch (error) {

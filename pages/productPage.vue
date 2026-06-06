@@ -80,8 +80,8 @@
                             </el-tooltip>
                         </div>
                         <div class="switch-container">
-                            <span class="switch-status-text">{{ state.product.active ? 'Ativo na loja' : 'Oculto na loja' }}</span>
-                            <el-switch id="product-active" v-model="state.product.active" style="--el-switch-on-color: #4a0f01;"/>
+                            <span class="switch-status-text">{{ state.product.published ? 'Ativo na loja' : 'Oculto na loja' }}</span>
+                            <el-switch id="product-active" v-model="state.product.published" style="--el-switch-on-color: #4a0f01;"/>
                         </div>
                     </div>
                 </div>
@@ -113,7 +113,7 @@ const state = reactive({
     quantity: 1,
     description: "",
     image: "",
-    active: true,
+    published: true,
   } as unknown as Product,
   isNew: true,
 });

@@ -7,13 +7,13 @@ export default defineEventHandler(async (event) => {
 
   try {
     const products = await ProductSchema.find({
-      active: true
+      published: true
     })
-    .sort({ createdAt: -1 })
-    .skip(skip)             
-    .limit(limit)             
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
 
-    const total = await ProductSchema.countDocuments({ active: true })
+    const total = await ProductSchema.countDocuments({ published: true })
 
     return {
       data: products,

@@ -19,10 +19,15 @@ export const ProductSchema = defineMongooseModel<Product>({
       required: true,
       min: 0,
     },
-    active: {
+    published: {
       type: Boolean,
       required: true,
       default: false
+    },
+    active: {
+      type: Boolean,
+      required: true,
+      default: true,
     },
     abacatePayId: {
       type: String,
