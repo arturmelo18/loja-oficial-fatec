@@ -39,6 +39,59 @@
       <div v-if="state.products.length === 0 && !isLoading" class="flex justify-center">
         <img src="../imgs/no_products.png" class="w-[800px] h-[400px]">
       </div>
+      <div v-else-if="!isLoading" class="products-grid" v-infinite-scroll="fetchMore">
+        <product-view v-for="product in allProducts" :key="product._id" :product="product"/>
+      </div>
+      <div v-else class="flex justify-center">
+        <span>Carregando produtos...</span>
+      </div>
+    </div>
+
+    <lof-footer/>
+  </div>
+</template>
+
+<template>
+  <div class="h-screen w-screen bg-cream">
+    <nav-bar/>
+    
+    <div class="hero" v-if="slides.length > 0">
+      <div class="carousel" id="carousel">
+        <div 
+          v-for="(slide, index) in slides" 
+          :key="index"
+          :class="['carousel-slide', { active: currentSlide === index }]"
+        >
+          <div class="slide-bg" :style="{ backgroundImage: `url(${slide.image})` }"></div>
+          <div class="slide-overlay"></div>
+          <div class="slide-content">
+            <h1>{{ slide.title }}</h1>
+            <p>{{ slide.description }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <button class="carousel-btn prev" @click="prevSlide">‹</button>
+      <button class="carousel-btn next" @click="nextSlide">›</button>
+      
+      <div class="carousel-dots">
+        <button 
+          v-for="(_, index) in slides"
+          :key="index"
+          :class="['c-dot', { active: currentSlide === index }]"
+          @click="currentSlide = index"
+        ></button>
+      </div>
+    </div>
+
+    <!-- PRODUCTS SECTION -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">Novidades</h2>
+      </div>
+      <div v-if="state.products.length === 0 && !isLoading" class="flex justify-center">
+        <img src="../imgs/no_products.png" class="w-[800px] h-[400px]">
+      </div>
       <div v-else-if="!isLoading" class="products-grid" v-infinite-scroll="nextPage">
         <product-view v-for="product in state.products" :key="product._id" :product="product"/>
       </div>
@@ -125,6 +178,12 @@ function prevSlide() {
   currentSlide.value = (currentSlide.value - 1 + slides.value.length) % slides.value.length
 }
 </script>
+
+<style scoped>
+.bg-cream {
+  background: #F2EDE6;
+}
+</style>
 
 <style scoped>
 .bg-cream {
