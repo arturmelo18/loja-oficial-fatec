@@ -43,12 +43,12 @@
                 <span class="item-name">{{ item.product.name }}</span>
                 <span class="item-qty">Quantidade: {{ item.quantity }}</span>
               </div>
-              <span class="item-price">{{ formatPrice(item.product.price * item.quantity) }}</span>
+              <span class="item-price">{{ formatPrice((item.price ?? item.product.price) * item.quantity / 100) }}</span>
             </div>
           </div>
 
           <div class="order-foot">
-            <span class="order-total">Total: {{ formatPrice(order.total) }}</span>
+            <span class="order-total">Total: {{ formatPrice(order.total / 100) }}</span>
             <span class="pickup-tag">
               <i class="ti ti-map-pin" aria-hidden="true"></i>
               Retirada na Fatec
@@ -69,8 +69,6 @@ import type { Order } from '~/types/Order'
 const authStore = useAuthStore()
 const isLoading = ref(false)
 const orders = ref<Order[]>([])
-
-console.log('orders[0].items:', JSON.stringify(orders[0]?.items, null, 2))
 
 onMounted(async () => {
   isLoading.value = true
