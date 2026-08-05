@@ -22,7 +22,7 @@ export const ProductSchema = defineMongooseModel<Product>({
     published: {
       type: Boolean,
       required: true,
-      default: false
+      default: true
     },
     active: {
       type: Boolean,
